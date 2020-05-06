@@ -1,16 +1,16 @@
-package wsserver
+package chat
 
-// Message - slice bytes
-//[]byte
-type Message []byte
+// Message - sdf
+// letter string
+// from   int
+type Message struct {
+	letter string
+}
 
-// Messages struc for queue messages for/from a client
-//  type []Template
+// Messages - array Message
 type Messages []Message
 
 // AddMessage - func AddMessage(message Message)
-// add new messages in array
-// Message []byte
 func (m *Messages) AddMessage(message Message) {
 	*m = append((*m)[:], message)
 }
