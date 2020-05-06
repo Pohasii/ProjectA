@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	ch "gameserver/chat"
-	ws "gameserver/wsserver"
 	"log"
 	"os"
+	ch "projecta/chat"
+	ws "projecta/wsserver"
 	"strings"
 )
 

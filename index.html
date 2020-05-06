@@ -18,7 +18,7 @@ window.addEventListener("load", function(evt) {
         if (ws) {
             return false;
         }
-        ws = new WebSocket(`ws://${address.value}/ws`); // 'ws://192.168.0.67:55443/ws'
+        ws = new WebSocket(`ws://${address.value}/ws`);
         ws.onopen = function(evt) {
             print("OPEN");
         }

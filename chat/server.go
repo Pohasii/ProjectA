@@ -3,8 +3,8 @@ package chat
 import (
 	"encoding/json"
 	"fmt"
-	ws "gameserver/wsserver"
 	"log"
+	ws "projecta/wsserver"
 )
 
 // var FromChatChan chan Letter = make(chan Letter, StackMessages)

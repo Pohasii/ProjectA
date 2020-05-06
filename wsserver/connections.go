@@ -19,9 +19,9 @@ var lastID int
 func (c *Connections) Add(conn *websocket.Conn) {
 
 	var Client Client = Client{
-		ID:      lastID,
-		Send:    make(chan []byte, maxMessageSize),
-		OutMess: make(Messages, 0, MessagesCapacity),
+		ID:   lastID,
+		Send: make(chan []byte, maxMessageSize),
+		// OutMess: make(Messages, 0, MessagesCapacity),
 		// InMess:  make(Messages, 0, MessagesCapacity),
 	}
 
@@ -66,33 +66,6 @@ func (c *Connections) DelByID(id int) {
 		*c = append((*c)[:id], (*c)[id+1:]...)
 	}
 }
-
-// SendAll - send messages all client
-func (c *Connections) SendAll(Message Message) {
-	if len(*c) > 0 {
-		for i := range *c {
-			(*c)[i].OutMess.AddMessage(Message)
-		}
-	}
-}
-
-// // SendOtherClient - send messages all client
-// func (c *Connections) SendOtherClient(ID int, Message Message) {
-// 	if len(*c) > 0 {
-// 		for i := range *c {
-// 			if i != ID {
-// 				(*c)[i].OutMess.AddMessage(Message)
-// 			}
-// 		}
-// 	}
-// }
-
-//// SendByIDClient - send messages by ID to client
-//func (c *Connections) SendByIDClient(ID int, Message Message) {
-//	if len(*c) > 0 {
-//		(*c)[ID].OutMess.AddMessage(Message)
-//	}
-//}
 
 // CleanOffConn - remove client with off status
 func (c *Connections) CleanOffConn() {
@@ -159,61 +132,3 @@ func (c *Connections) PushOnlineClientsToChat() {
 		InChan <- Letter{87654321, "2550", string(online)}
 	}
 }
-
-// GetOnlineClients - return ids offline client
-//func (c *Connections) GetOnlineClients() UsersOnline {
-//	TheseOn := make(UsersOnline, 0, MaxConnections)
-//	if len(*c) > 0 {
-//		for i := range *c {
-//			if (*c)[i].Status == true {
-//				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID, (*c)[i].Nick})
-//			}
-//		}
-//		return TheseOn
-//	}
-//	return TheseOn
-//}
-
-//// CleanOffConn - remove client with off status
-//func (c *Clients) CleanOffConn(status *bool, badConn []int) {
-//	// tick := time.Tick(ClearPer * time.Millisecond)
-//	//for range tick {
-//		if len(*c) > 0 && *status {
-//			thisdel := make([]int, 0, MaxConnections)
-//			for i := range *c {
-//				if (*c)[i].Status == false {
-//					thisdel = append(thisdel, i)
-//				}
-//			}
-//			if len(thisdel) > 0 {
-//				for _, ID := range thisdel {
-//					// fmt.Println("before del: ", *c)
-//					(*c).DelByID(ID)
-//					// fmt.Println("after del: ", *c)
-//				}
-//
-//				fmt.Println("remove bad connections: ", thisdel)
-//				thisdel = make([]int, 0, MaxConnections)
-//				*status = false
-//			}
-//		}
-//	// }
-//}
-
-//// CleanOffConn - remove client with off status
-//func (c *Clients) CleanOffConn(badConn []int) {
-//	// tick := time.Tick(ClearPer * time.Millisecond)
-//	//for range tick {
-//	if len(*c) > 0 {
-//		if len(badConn) > 0 {
-//			for _, ID := range badConn {
-//				fmt.Println("before del: ", *c)
-//				(*c).DelByID(ID)
-//				fmt.Println("after del: ", *c)
-//			}
-//
-//			fmt.Println("remove bad connections: ", badConn)
-//		}
-//	}
-//	// }
-//}

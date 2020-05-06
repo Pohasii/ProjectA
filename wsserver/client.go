@@ -14,8 +14,8 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	Send    chan []byte
-	OutMess Messages
+	Send chan []byte
+	// OutMess Messages
 	// InMess  Messages
 	ID     int
 	Status bool
@@ -71,27 +71,6 @@ func (c *Client) writePump() {
 	}
 }
 
-// case <-CheckTicker:
-// 	if !c.Status {
-// 		return
-// 	}
-// 	if len(c.OutMess) > 0 {
-// 		go func() {
-// 			Message := c.OutMess
-// 			var count int
-// 			for i, mes := range Message {
-// 				c.Send <- mes
-// 				count = i
-// 			}
-// 			// c.Send <- c.OutMess.GetMessages()[0]
-// 			if count == 0 {
-// 				(*c).OutMess = c.OutMess[1:]
-// 			} else {
-// 				(*c).OutMess = c.OutMess[count:]
-// 			}
-// 		}()
-// 	}
-
 // readPump pumps messages from the websocket connection to the hub.
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
@@ -121,71 +100,9 @@ func (c *Client) readPump() {
 		typeLett := lettToStr[0:4]
 		letter := lettToStr[4:]
 
-		// LettersFrom.Add(Letter{c.ID, typeLett, letter})
 		InChan <- Letter{c.ID, typeLett, letter}
-		// fmt.Println("New message: ", message, " to string: ", string(message))
-		// c.Out <- message
-		// c.InMess.AddMessage(message)
 	}
 }
-
-// outgoingMessagesRouter func for read messages from array outMess
-// and send it in the send of Chan for writePump func
-// func (c *Client) outgoingMessagesRouter() {
-//
-// 	tick := time.Tick(СheckingMessages * time.Millisecond)
-// 	for range tick {
-// 		if !c.Status {
-// 			return
-// 		}
-// 		if len(c.OutMess.GetMessages()) > 0 {
-// 			c.Send <- c.OutMess.GetMessages()[0]
-// 			c.OutMess.DelFirstM()
-// 		}
-// 	}
-// }
-
-// PushMessagesForRouter - push message for array letter for router
-//func (c *Client) PushMessagesForRouter() {
-//
-//	tick := time.Tick(PushMessage * time.Millisecond)
-//	for range tick {
-//		if !c.Status {
-//			return
-//		}
-//		if len(c.InMess) > 0 {
-//
-//			mesFor := make(Letters, 0, 500)
-//			var count int
-//
-//			for i, val := range c.InMess {
-//				lettToStr := string(val)
-//				typeLett := lettToStr[0:4]
-//				letter := lettToStr[4:]
-//				mesFor = append(mesFor, Letter{c.ID, typeLett, letter})
-//				count = i
-//			}
-//
-//			if count == 0 {
-//				(*c).InMess = (*c).InMess[1:]
-//			} else {
-//				(*c).InMess = (*c).InMess[count:]
-//			}
-//
-//			LettersFrom = append(LettersFrom, mesFor...)
-//
-//			// (*c).InMess.DelFirstM()
-//
-//			// for _, val := range c.InMess {
-//			// 	lettToStr := string(val)
-//			// 	typeLett := lettToStr[0:4]
-//			// 	letter := lettToStr[4:]
-//			// 	LettersFrom.Add(Letter{c.ID, typeLett, letter})
-//			// 	(*c).InMess.DelFirstM()
-//			// }
-//		}
-//	}
-//}
 
 // start - func for start methods of client
 func (c *Client) start() {

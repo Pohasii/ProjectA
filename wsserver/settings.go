@@ -37,11 +37,6 @@ const (
 	// letters/addFor()
 	LettersSort = 10
 
-	// PushMessage - letter sorting frequency
-	// using:
-	// client/PushMessagesForRouter()
-	// PushMessage = 10
-
 	// Maximum message size allowed from peer.
 	// using in:
 	// clients/Add

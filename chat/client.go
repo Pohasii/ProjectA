@@ -2,8 +2,8 @@ package chat
 
 import (
 	"encoding/json"
-	ws "gameserver/wsserver"
 	"log"
+	ws "projecta/wsserver"
 )
 
 type UserOnline struct {
