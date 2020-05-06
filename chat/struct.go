@@ -1,5 +1,17 @@
 package chat
 
+// all chat from user
+type AllChatFromUser struct {
+	// FromID int    `json:"f"`
+	Text string `json:"t"`
+}
+
+// AllChatForUser - all chat for user
+type AllChatForUser struct {
+	FromID int    `json:"f"`
+	Text   string `json:"t"`
+}
+
 // StandardMess - mess for all
 type StandardMess struct {
 	FromID int    `json:"f"`
@@ -17,9 +29,16 @@ type Who struct {
 	Nick string `json:"n"`
 }
 
-// PrivatMess - for private mess
-type PrivatMess struct {
-	ForID  int    `json:"fod"`
+// PrivatMessFrom - for private mess
+type PrivatMessFrom struct {
+	ForID int `json:"f"`
+	// FromID int    `json:"fid"`
+	Text string `json:"t"`
+}
+
+// PrivatMessFor - for private mess
+type PrivatMessFor struct {
+	//ForID int `json:"f"`
 	FromID int    `json:"fid"`
 	Text   string `json:"t"`
 }

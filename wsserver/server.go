@@ -9,17 +9,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var OutChan chan Letter = make(chan Letter, 500)
+
+var InChan chan Letter = make(chan Letter, 500)
+
+func GetOutChan() chan Letter {
+	return OutChan
+}
+
+func GetInChan() chan Letter {
+	return InChan
+}
+
 // Conns - all connection clients
 var Conns Connections = make(Connections, 0, MaxConnections)
-
-// LettersFrom - Letters from all users for router
-var LettersFrom Letters
-
-// LettersFor - Letters for all users to send
-var LettersFor Letters
-
-// RunCleanConn - defoult false
-var RunCleanConn bool = false
 
 // 192.168.0.65
 var (
@@ -55,17 +58,30 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 
 // Start func Start(client *Client)
 // start http Websocket server
-func Start(sendMessage, incomingMessages chan interface{}) {
+func Start(ChanFromWS, ChanForWS chan Letter) {
 
 	go Conns.CleanOffConn()
-	go LettersFor.addFor()
+	go sortingForUsers()
 
 	flag.Parse()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ServeWs(w, r, &Conns)
 	})
-	err := http.ListenAndServe(*addr, nil)
+
+	var addr = flag.String("addr", Addr, "http service address")
+	err := http.ListenAndServe(*addr, nil) // *addr
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
+// sortingForUsers - func for letter sorting for clients
+func sortingForUsers() { // addFor
+	for let := range OutChan {
+		for _, conn := range Conns {
+			if conn.ID == let.ClientID && conn.Status != false {
+				conn.Send <- []byte(let.LetterType + let.Scroll)
+			}
+		}
 	}
 }

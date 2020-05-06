@@ -6,6 +6,7 @@
 window.addEventListener("load", function(evt) {
     var output = document.getElementById("output");
     var input = document.getElementById("input");
+    var address = document.getElementById("address");
     var ws;
     var print = function(message) {
         var d = document.createElement("div");
@@ -17,7 +18,7 @@ window.addEventListener("load", function(evt) {
         if (ws) {
             return false;
         }
-        ws = new WebSocket('ws://localhost:8080/ws');
+        ws = new WebSocket(`ws://${address.value}/ws`); // 'ws://192.168.0.67:55443/ws'
         ws.onopen = function(evt) {
             print("OPEN");
         }
@@ -38,6 +39,7 @@ window.addEventListener("load", function(evt) {
             return false;
         }
         print("SEND: " + input.value);
+        console.log(input.value)
         ws.send(input.value);
         return false;
     };
@@ -79,6 +81,7 @@ You can change the message and send multiple times.
 <form>
 <button id="open">Open</button>
 <button id="close">Close</button>
+<p><input id="address" type="text" value='192.168.0.67:8888'>
 <p><input id="input" type="text" value='{"r":"test", "m":"testMes"}'>
 <button id="send">Send</button>
 </form>

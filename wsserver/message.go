@@ -12,14 +12,14 @@ type Messages []Message
 // add new messages in array
 // Message []byte
 func (m *Messages) AddMessage(message Message) {
-	*m = append((*m)[:], message)
+	*m = append(*m, message)
 }
 
 // GetMessages - func (ver *Messages) GetMessages() Messages
 // get array of messages
-func (m *Messages) GetMessages() Messages {
-	return *m
-}
+// func (m *Messages) GetMessages() Messages {
+//	return *m
+// }
 
 // DelFirstM - func (ver *Messages) DelFirstM()
 // delete first messages in array
@@ -29,4 +29,11 @@ func (m *Messages) DelFirstM() {
 	} else {
 		*m = make(Messages, 0, cap(*m))
 	}
+}
+
+// Letter - message type for global array
+type Letter struct {
+	ClientID   int
+	LetterType string
+	Scroll     string
 }

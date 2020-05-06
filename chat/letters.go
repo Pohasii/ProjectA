@@ -25,7 +25,7 @@ type Letters []Letter
 // }
 func (l *Letters) Add(letter Letter) {
 	// l[len(*l)] = letter
-	*l = append((*l)[:], letter)
+	*l = append(*l, letter)
 }
 
 // GetAllLetters - gh
@@ -70,15 +70,15 @@ func (l *Letters) Start() {
 			switch let.LetterType {
 
 			case "2002":
-				// mess for all
+				// mess for all  // AllChatForUser AllChatFromUser
 				allU := UsersOnl.GetAllUsersID()
-				mes := &StandardMess{}
+				mes := &AllChatFromUser{}
 				err := json.Unmarshal([]byte(let.Scroll), &mes)
 				if err != nil {
 					log.Println(err)
 				}
 
-				jsonData, err := json.Marshal(StandardMess{mes.FromID, mes.Text})
+				jsonData, err := json.Marshal(AllChatForUser{let.ClientID, mes.Text})
 				if err != nil {
 					log.Printf("error: %v", err)
 					// break
@@ -94,14 +94,14 @@ func (l *Letters) Start() {
 
 			case "2003":
 				// privat mess
-				mes := &PrivatMess{}
+				mes := &PrivatMessFrom{}
 
 				err := json.Unmarshal([]byte(let.Scroll), &mes)
 				if err != nil {
 					log.Println(err)
 				}
-
-				jsonData, err := json.Marshal(StandardMess{mes.FromID, mes.Text})
+				// PrivatMessFrom PrivatMessFor
+				jsonData, err := json.Marshal(PrivatMessFor{let.ClientID, mes.Text})
 				if err != nil {
 					log.Printf("error: %v", err)
 					// break

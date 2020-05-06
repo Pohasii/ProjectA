@@ -1,29 +1,35 @@
 package wsserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-// Clients - []Client
+// Connections - []Client
 type Connections []Client
+
+// id for user
+var lastID int
 
 // Add - func for add new client for Clients array
 // expected WS conn
 func (c *Connections) Add(conn *websocket.Conn) {
 
 	var Client Client = Client{
-		ID:      len(*c),
+		ID:      lastID,
 		Send:    make(chan []byte, maxMessageSize),
 		OutMess: make(Messages, 0, MessagesCapacity),
-		InMess:  make(Messages, 0, MessagesCapacity),
+		// InMess:  make(Messages, 0, MessagesCapacity),
 	}
 
 	Client.Conn = conn
 	Client.Status = true
-	*c = append((*c)[:], Client)
+	*c = append(*c, Client)
+	lastID++
+	c.PushOnlineClientsToChat()
 }
 
 // GetClients - func GetClients() Clients
@@ -70,27 +76,29 @@ func (c *Connections) SendAll(Message Message) {
 	}
 }
 
-// SendOtherClient - send messages all client
-func (c *Connections) SendOtherClient(ID int, Message Message) {
-	if len(*c) > 0 {
-		for i := range *c {
-			if i != ID {
-				(*c)[i].OutMess.AddMessage(Message)
-			}
-		}
-	}
-}
+// // SendOtherClient - send messages all client
+// func (c *Connections) SendOtherClient(ID int, Message Message) {
+// 	if len(*c) > 0 {
+// 		for i := range *c {
+// 			if i != ID {
+// 				(*c)[i].OutMess.AddMessage(Message)
+// 			}
+// 		}
+// 	}
+// }
 
-// SendByIDClient - send messages by ID to client
-func (c *Connections) SendByIDClient(ID int, Message Message) {
-	if len(*c) > 0 {
-		(*c)[ID].OutMess.AddMessage(Message)
-	}
-}
+//// SendByIDClient - send messages by ID to client
+//func (c *Connections) SendByIDClient(ID int, Message Message) {
+//	if len(*c) > 0 {
+//		(*c)[ID].OutMess.AddMessage(Message)
+//	}
+//}
 
 // CleanOffConn - remove client with off status
 func (c *Connections) CleanOffConn() {
+
 	tick := time.Tick(ClearPer * time.Millisecond)
+
 	for range tick {
 		if len(*c) > 0 {
 			thisdel := make([]int, 0, MaxConnections)
@@ -108,6 +116,7 @@ func (c *Connections) CleanOffConn() {
 
 				fmt.Println("remove bad connections: ", thisdel)
 				thisdel = make([]int, 0, MaxConnections)
+				c.PushOnlineClientsToChat()
 			}
 		}
 	}
@@ -115,16 +124,16 @@ func (c *Connections) CleanOffConn() {
 
 // GetOfflineClient - return ids offline client
 func (c *Connections) GetOfflineClient() []int {
-	thisOff := make([]int, 0, MaxConnections)
+	TheseOff := make([]int, 0, MaxConnections)
 	if len(*c) > 0 {
 		for i := range *c {
 			if (*c)[i].Status == false {
-				thisOff = append(thisOff, (*c)[i].ID)
+				TheseOff = append(TheseOff, (*c)[i].ID)
 			}
 		}
-		return thisOff
+		return TheseOff
 	}
-	return thisOff
+	return TheseOff
 
 }
 
@@ -134,19 +143,36 @@ type UserOnline struct {
 	Nick string `json:"n"`
 }
 
-// GetOnlineClients - return ids offline client
-func (c *Connections) GetOnlineClients() UsersOnline {
-	thisOn := make(UsersOnline, 0, MaxConnections)
+// pushOnlineClientsToChat - return ids offline client
+func (c *Connections) PushOnlineClientsToChat() {
+	TheseOn := make(UsersOnline, 0, MaxConnections)
 	if len(*c) > 0 {
 		for i := range *c {
 			if (*c)[i].Status == true {
-				thisOn = append(thisOn, UserOnline{(*c)[i].ID, (*c)[i].Nick})
+				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID, (*c)[i].Nick})
 			}
 		}
-		return thisOn
+		online, err := json.Marshal(TheseOn)
+		if err != nil {
+			fmt.Println("GetOnlineClients: ", err)
+		}
+		InChan <- Letter{87654321, "2550", string(online)}
 	}
-	return thisOn
 }
+
+// GetOnlineClients - return ids offline client
+//func (c *Connections) GetOnlineClients() UsersOnline {
+//	TheseOn := make(UsersOnline, 0, MaxConnections)
+//	if len(*c) > 0 {
+//		for i := range *c {
+//			if (*c)[i].Status == true {
+//				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID, (*c)[i].Nick})
+//			}
+//		}
+//		return TheseOn
+//	}
+//	return TheseOn
+//}
 
 //// CleanOffConn - remove client with off status
 //func (c *Clients) CleanOffConn(status *bool, badConn []int) {

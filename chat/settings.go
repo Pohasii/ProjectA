@@ -5,7 +5,7 @@ const (
 	StackMessages = 2000
 
 	// Update - update logic chat
-	Update = 100
+	Update = 30
 
 	// SpeedUpdateOnChat - speed update list of online users in chat
 	SpeedUpdateOnChat = 750

@@ -1,26 +1,25 @@
 package wsserver
 
 import (
-	"flag"
 	"time"
 )
 
-// address for open listening
+// Addr - address for open listening
 // using in:
 // server/Start()
-var addr = flag.String("addr", "localhost:8080", "http service address")
+// main.go
+var Addr string
 
-//192.168.0.105:8081
-//192.168.0.65:55443
+// var addr = flag.String("addr", Addr, "http service address")
 
 const (
 	// ClearPer - Сhecking for messages to send
 	// using in clients/CleanOffConn()
-	ClearPer = 3000
+	ClearPer = 2000
 
 	// СheckingMessages - Сhecking for messages to send
-	// useing in client/outgoingMessagesRouter()
-	СheckingMessages = 16
+	// useing in client/writePump()
+	СheckingMessages = 25
 
 	// MaxConnections - max connections clients
 	// using in:
@@ -41,7 +40,7 @@ const (
 	// PushMessage - letter sorting frequency
 	// using:
 	// client/PushMessagesForRouter()
-	PushMessage = 10
+	// PushMessage = 10
 
 	// Maximum message size allowed from peer.
 	// using in:
