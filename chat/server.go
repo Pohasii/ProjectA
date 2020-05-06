@@ -29,57 +29,9 @@ var LettersFor Letters = make(Letters, 0, StackMessages)
 var UsersOnl UsersOnline = make(UsersOnline, 0, StackMessages)
 
 func Start(ChanForWS chan ws.Letter) {
-	// go LettersIns.Start()
+
 	go Router(ChanForWS)
-	// go UsersOnl.pushOnline(ChanForWS)
 }
-
-//func AddletForChat(letter ws.Letter) {
-//	LettersIns.Add(Letter{letter.ClientID, letter.LetterType, letter.Scroll})
-//}
-
-// ReloadLetterFromChatToWS - test
-//func ReloadLetterFromChatToWS(ChanForWS chan ws.Letter) { //Letters *ws.Letters
-//	ticker := time.Tick(Update * time.Millisecond)
-//	for range ticker {
-//		if len(LettersFor) > 0 {
-//			for _, let := range LettersFor {
-//				ChanForWS <- ws.Letter(let)
-//				LettersFor.DelFirstL()
-//			}
-//		}
-//	}
-//	//newLet := make(ws.Letters, 0, len(*letters))
-//	//ticker := time.Tick(Update * time.Millisecond)
-//	//for range ticker {
-//	//	LetForS := LettersFor.GetAllLetters()
-//	//	// fmt.Println("LetForS :", LetForS)
-//	//	// fmt.Println("LettersFor :", LettersFor)
-//	//	if len(LetForS) > 0 {
-//	//		for i := range LetForS {
-//	//			newLet = append(newLet, ws.Letter{LetForS[i].ClientID, LetForS[i].LetterType, LetForS[i].Scroll})
-//	//		}
-//	//		(*letters).PushMore(newLet)
-//	//		LettersFor.DelById(len(newLet))
-//	//		newLet = make(ws.Letters, 0, len(*letters))
-//	//		fmt.Println("  reload mm ")
-//	//	}
-//	//}
-//}
-
-// func UpdateOnlineChat(conn *ws.Connections) {
-// 	ticker := time.Tick(SpeedUpdateOnChat * time.Millisecond)
-// 	for range ticker {
-// 		new := conn.GetOnlineClients()
-// 		// fmt.Println("conn: ", conn)
-// 		ready := make(UsersOnline, 0, MaxConnections)
-// 		for i := range new {
-// 			ready = append(ready, UserOnline{new[i].ID, new[i].Nick})
-// 		}
-// 		UsersOnl.Push(ready)
-// 		// fmt.Println("UsersOnl: ", UsersOnl)
-// 	}
-// }
 
 // Router chat logic
 func Router(ChanForWS chan ws.Letter) {
@@ -157,8 +109,7 @@ func Router(ChanForWS chan ws.Letter) {
 				}
 				UsersOnl.Push(newOnline)
 				UsersOnl.pushOnlineToClient(ChanForWS)
-				// fmt.Println("newOnline: ", newOnline)
-				// fmt.Println("UsersOnl: ", UsersOnl)
+
 			}
 
 		default:

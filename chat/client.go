@@ -54,21 +54,3 @@ func (u *UsersOnline) pushOnlineToClient(ChanForWS chan ws.Letter) {
 		ChanForWS <- ws.Letter(Letter{val.ID, "2004", string(jsonData)})
 	}
 }
-
-// func (u *UsersOnline) pushOnlineToClient(ChanForWS chan ws.Letter) {
-// 	push := time.Tick(2000 * time.Millisecond)
-// 	old := *u
-// 	for range push {
-// 		if !reflect.DeepEqual(*u, old) {
-// 			jsonData, err := json.Marshal(*u)
-// 			if err != nil {
-// 				log.Printf("error: %v", err)
-// 				// break
-// 			}
-// 			for _, val := range *u {
-// 				ChanForWS <- ws.Letter(Letter{val.ID, "2004", string(jsonData)})
-// 			}
-// 			old = *u
-// 		}
-// 	}
-// }
