@@ -14,9 +14,7 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	Send chan []byte
-	// OutMess Messages
-	// InMess  Messages
+	Send   chan []byte
 	ID     int
 	Status bool
 	Remove bool
@@ -111,8 +109,6 @@ func (c *Client) start() {
 	// new goroutines.
 	go c.writePump()
 	go c.readPump()
-	// go c.outgoingMessagesRouter()
-	// go c.PushMessagesForRouter()
 }
 
 // GetID - return Client ID

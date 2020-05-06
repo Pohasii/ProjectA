@@ -21,8 +21,6 @@ func (c *Connections) Add(conn *websocket.Conn) {
 	var Client Client = Client{
 		ID:   lastID,
 		Send: make(chan []byte, maxMessageSize),
-		// OutMess: make(Messages, 0, MessagesCapacity),
-		// InMess:  make(Messages, 0, MessagesCapacity),
 	}
 
 	Client.Conn = conn
@@ -116,7 +114,7 @@ type UserOnline struct {
 	Nick string `json:"n"`
 }
 
-// pushOnlineClientsToChat - return ids offline client
+// PushOnlineClientsToChat - return ids offline client
 func (c *Connections) PushOnlineClientsToChat() {
 	TheseOn := make(UsersOnline, 0, MaxConnections)
 	if len(*c) > 0 {
