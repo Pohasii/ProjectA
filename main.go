@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,83 +14,99 @@ func main() {
 
 	// init address for WS Server
 	func() {
-		reader := bufio.NewReader(os.Stdin)
+
+		var ip string
+		var port string
 		fmt.Print("Enter IP:")
-		ip, _ := reader.ReadString('\n')
-		// convert CRLF to LF
-		ip = strings.Replace(ip, "\n", "", -1)
-
+		fmt.Fscan(os.Stdin, &ip)
 		fmt.Print("Enter Port:")
-		port, _ := reader.ReadString('\n')
-		// convert CRLF to LF
-		port = strings.Replace(port, "\n", "", -1)
-
-		fmt.Println("address:", ip+":"+port)
-		ws.Addr = ip + ":" + port
+		fmt.Fscan(os.Stdin, &port)
+		adr := strings.Join([]string{ip, port}, ":")
+		ws.Addr = adr
+		fmt.Println("The server started at this address: ", adr)
 	}()
 
-	fmt.Println("Start server :)")
 	// =====================================================================
 	// ws server
 	Clients := &ws.Conns
 
-	ChanFromWS := ws.GetInChan()
+	ChanFromWS := ws.GetFromConnChan()
 	ChanForWS := ws.GetOutChan()
 
-	go ws.Start(ChanFromWS, ChanForWS)
-	// LettersFor := &ws.LettersFor
+	go ws.Start()
 
 	// =====================================================================
 	// Chats
-	InChatChan := ch.GetInChatChan()
-	ch.Start(ChanForWS)
-	// go ch.UpdateOnlineChat(Clients)
-	// go ch.ReloadLetterFromChatToWS(ChanForWS)
 
-	// GetFromChatChan
+	ch.Start() //
+	InChatChan := ch.GetInChatChan()
+	FromChatChan := ch.GetFromChatChan()
+
+	// reload message from chat
+	go func() {
+		for val := range FromChatChan {
+			ChanForWS <- val
+		}
+	}()
 	// =====================================================================
 	// router sms
 
 	//fmt.Println(ws.LettersFrom)
 
-	for letter := range ChanFromWS {
+	for let := range ChanFromWS {
+		go func() {
 
-		if letter.LetterType == "1001" {
-			scrollFrom := &registerNewUs{}
-			err := json.Unmarshal([]byte(letter.Scroll), &scrollFrom)
+			letter := letterType{}
+			err := json.Unmarshal(let, &letter)
 			if err != nil {
-				log.Println(err)
+				log.Fatalln("main.go: 65 line: ", err)
 			}
 
-			// res := Clients.Add(ws.LettersFrom[i].ClientID, scrollFrom.Nick)
-			(*Clients)[letter.ClientID].Nick = scrollFrom.Nick
+			if letter.LetterType == "1001" {
 
-			jsonData, err := json.Marshal(registerNewUsTrue{letter.ClientID, (*Clients)[letter.ClientID].Status})
-			if err != nil {
-				log.Printf("error: %v", err)
-				// break
+				scrollFrom := &registerNewUs{}
+				err := json.Unmarshal([]byte(letter.Scroll), &scrollFrom)
+				if err != nil {
+					log.Println(err)
+				}
+
+				// res := Clients.Add(ws.LettersFrom[i].ClientID, scrollFrom.Nick)
+				(*Clients)[letter.ClientID].Nick = scrollFrom.Nick
+
+				jsonData, err := json.Marshal(registerNewUsTrue{letter.ClientID, (*Clients)[letter.ClientID].Status})
+				if err != nil {
+					log.Printf("error: %v", err)
+					// break
+				}
+
+				send, err := json.Marshal(letterType{letter.ClientID, "1001", string(jsonData)})
+				if err != nil {
+					log.Println(err)
+				}
+
+				// fmt.Println(send)
+				ChanForWS <- send
+				(*Clients).PushOnlineClientsToChat()
 			}
 
-			ChanForWS <- ws.Letter{letter.ClientID, "1001", string(jsonData)}
-			// fmt.Println((*Clients)[letter.ClientID])
-			(*Clients).PushOnlineClientsToChat()
-			continue
-		}
-		switch letter.LetterType[0:1] {
+			switch letter.LetterType[0:1] {
 
-		case "1":
-			// auth
-			fmt.Println("auth in dev")
-		case "2":
-			fmt.Print("send to chat: ")
-			// ws.LettersFrom[i].
-			fmt.Println(letter.Scroll)
-			// ch.AddletForChat(letter)
-			InChatChan <- ch.Letter(letter)
-		default:
-			fmt.Println("incorrect message from userID: ", letter.ClientID)
-		}
+			case "1":
+				// auth
+				fmt.Println("auth in dev")
+			case "2":
+				fmt.Print("send to chat: ")
+				fmt.Println(letter.Scroll)
 
+				send, err := json.Marshal(letter)
+				if err != nil {
+					log.Println(err)
+				}
+				InChatChan <- send // ch.Letter(letter)
+			default:
+				fmt.Println("incorrect message from userID: ", letter.ClientID)
+			}
+		}()
 	}
 
 }
@@ -105,51 +120,8 @@ type registerNewUsTrue struct {
 	Status bool `json:"s"`
 }
 
-// err := json.Unmarshal(Clients[index].InMess[0], &mes)
-// 				if err != nil {
-// 					log.Println(err)
-// 				}
-// jsonData, err := json.Marshal(Message{"test2-ready", m})
-// 		if err != nil {
-// 			log.Printf("error: %v", err)
-// 			break
-// 		}
-
-// tick := time.Tick(10 * time.Millisecond)
-// for range tick {
-// 	//fmt.Println(ws.LettersFrom)
-// 	for i := range ws.LettersFrom {
-// 		if ws.LettersFrom[i].LetterType == "1001" {
-// 			scrollFrom := &registerNewUs{}
-// 			err := json.Unmarshal([]byte(ws.LettersFrom[i].Scroll), &scrollFrom)
-// 			if err != nil {
-// 				log.Println(err)
-// 			}
-// 			// res := Clients.Add(ws.LettersFrom[i].ClientID, scrollFrom.Nick)
-// 			(*Clients)[ws.LettersFrom[i].ClientID].Nick = scrollFrom.Nick
-// 			jsonData, err := json.Marshal(registerNewUsTrue{ws.LettersFrom[i].ClientID, (*Clients)[ws.LettersFrom[i].ClientID].Status})
-// 			if err != nil {
-// 				log.Printf("error: %v", err)
-// 				// break
-// 			}
-// 			ws.LettersFor.Add(ws.Letter{ws.LettersFrom[i].ClientID, "1001", string(jsonData)})
-// 			ws.LettersFrom.DelFirstL()
-// 			continue
-// 		}
-// 		switch ws.LettersFrom[i].LetterType[0:1] {
-// 		case "1":
-// 			// auth
-// 			fmt.Println("auth in dev")
-// 			ws.LettersFrom.DelFirstL()
-// 		case "2":
-// 			fmt.Println("send to chat")
-// 			// ws.LettersFrom[i].
-// 			fmt.Println(ws.LettersFrom[i])
-// 			ch.AddletForChat(ws.LettersFrom[i])
-// 			ws.LettersFrom.DelFirstL()
-// 		default:
-// 			fmt.Println("incorrect message from userID: ", ws.LettersFrom[i].ClientID)
-// 			ws.LettersFrom.DelFirstL()
-// 		}
-// 	}
-// }
+type letterType struct {
+	ClientID   int
+	LetterType string
+	Scroll     string
+}

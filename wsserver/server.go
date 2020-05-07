@@ -1,6 +1,7 @@
 package wsserver
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -9,16 +10,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var OutChan chan Letter = make(chan Letter, 500)
+var OutChan chan []byte = make(chan []byte, 500)
 
-var InChan chan Letter = make(chan Letter, 500)
+// var InChan chan Letter = make(chan Letter, 500)
+var FromConnChan chan []byte = make(chan []byte, 500)
 
-func GetOutChan() chan Letter {
+func GetOutChan() chan []byte {
 	return OutChan
 }
 
-func GetInChan() chan Letter {
-	return InChan
+func GetFromConnChan() chan []byte {
+	return FromConnChan
 }
 
 // Conns - all connection clients
@@ -58,8 +60,9 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 
 // Start func Start(client *Client)
 // start http Websocket server
-func Start(ChanFromWS, ChanForWS chan Letter) {
+func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
 
+	// fmt.Println("OutChan: ", OutChan, "FromConnChan:  ", FromConnChan)
 	go Conns.CleanOffConn()
 	go sortingForUsers()
 
@@ -73,14 +76,20 @@ func Start(ChanFromWS, ChanForWS chan Letter) {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+
 }
 
 // sortingForUsers - func for letter sorting for clients
 func sortingForUsers() { // addFor
 	for let := range OutChan {
+		letter := Letter{}
+		err := json.Unmarshal(let, &letter)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		for _, conn := range Conns {
-			if conn.ID == let.ClientID && conn.Status != false {
-				conn.Send <- []byte(let.LetterType + let.Scroll)
+			if conn.ID == letter.ClientID && conn.Status != false {
+				conn.Send <- []byte(letter.LetterType + letter.Scroll)
 			}
 		}
 	}

@@ -4,58 +4,63 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	ws "projecta/wsserver"
 )
 
-// var FromChatChan chan Letter = make(chan Letter, StackMessages)
+var FromChatChan chan []byte = make(chan []byte, 1000)
 
-var InChatChan chan Letter = make(chan Letter, StackMessages)
+var InChatChan chan []byte = make(chan []byte, 1000)
 
-//func GetFromChatChan() chan Letter {
-//	return FromChatChan
-//}
+func GetFromChatChan() chan []byte {
+	return FromChatChan
+}
 
-func GetInChatChan() chan Letter {
+func GetInChatChan() chan []byte {
 	return InChatChan
 }
 
-// LettersIns - letters inside
-var LettersIns Letters = make(Letters, 0, StackMessages)
-
-// LettersFor - letters for send to users
-var LettersFor Letters = make(Letters, 0, StackMessages)
-
 // UsersOnl - letters for send to users
-var UsersOnl UsersOnline = make(UsersOnline, 0, StackMessages)
+var UsersOnl UsersOnline = make(UsersOnline, 0, MaxConnections)
 
-func Start(ChanForWS chan ws.Letter) {
+func Start() {
 
-	go Router(ChanForWS)
+	go Router()
+	fmt.Println("init chat")
+
 }
 
 // Router chat logic
-func Router(ChanForWS chan ws.Letter) {
+func Router() {
 	for letter := range InChatChan {
-		switch letter.LetterType {
+
+		let := Letter{}
+		err := json.Unmarshal(letter, &let)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		switch let.LetterType {
 
 		case "2002":
 			// mess for all  // AllChatForUser AllChatFromUser
 			allU := UsersOnl.GetAllUsersID()
 			mes := &AllChatFromUser{}
-			err := json.Unmarshal([]byte(letter.Scroll), &mes)
+			err := json.Unmarshal([]byte(let.Scroll), &mes)
 			if err != nil {
 				log.Println(err)
 			}
 
-			message, err := json.Marshal(AllChatForUser{letter.ClientID, mes.Text})
+			message, err := json.Marshal(AllChatForUser{let.ClientID, mes.Text})
 			if err != nil {
 				log.Printf("error: %v", err)
-				// break
 			}
 
 			for _, us := range allU {
-				if us != letter.ClientID {
-					ChanForWS <- ws.Letter(Letter{us, letter.LetterType, string(message)})
+				if us != let.ClientID {
+					send, err := json.Marshal(Letter{us, let.LetterType, string(message)})
+					if err != nil {
+						log.Printf("error: %v", err)
+					}
+					FromChatChan <- send
 				}
 			}
 
@@ -63,23 +68,26 @@ func Router(ChanForWS chan ws.Letter) {
 			// privat mess
 			mes := &PrivatMessFrom{}
 
-			err := json.Unmarshal([]byte(letter.Scroll), &mes)
+			err := json.Unmarshal([]byte(let.Scroll), &mes)
 			if err != nil {
 				log.Println(err)
 			}
 			// PrivatMessFrom PrivatMessFor
-			message, err := json.Marshal(PrivatMessFor{letter.ClientID, mes.Text})
+			message, err := json.Marshal(PrivatMessFor{let.ClientID, mes.Text})
 			if err != nil {
 				log.Printf("error: %v", err)
-				// break
 			}
 
-			ChanForWS <- ws.Letter(Letter{mes.ForID, letter.LetterType, string(message)})
+			send, err := json.Marshal(Letter{mes.ForID, let.LetterType, string(message)})
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
+			FromChatChan <- send
 
 		case "2005":
 			//only check
 			mes := &SerachByNick{}
-			err := json.Unmarshal([]byte(letter.Scroll), &mes)
+			err := json.Unmarshal([]byte(let.Scroll), &mes)
 			if err != nil {
 				log.Println(err)
 			}
@@ -93,28 +101,32 @@ func Router(ChanForWS chan ws.Letter) {
 					log.Printf("error: %v", err)
 					// break
 				}
-				ChanForWS <- ws.Letter(Letter{letter.ClientID, letter.LetterType, string(jsonData)})
+
+				send, err := json.Marshal(Letter{let.ClientID, let.LetterType, string(jsonData)})
+				if err != nil {
+					log.Printf("error: %v", err)
+				}
+				FromChatChan <- send
 			}
 
 		case "2550":
 			//only check
-			//fmt.Println("letter: ", letter)
-			if letter.ClientID == 87654321 {
+			if let.ClientID == 87654321 {
 
 				newOnline := make(UsersOnline, 0, 500)
 
-				err := json.Unmarshal([]byte(letter.Scroll), &newOnline)
+				err := json.Unmarshal([]byte(let.Scroll), &newOnline)
 				if err != nil {
 					fmt.Println(err)
 				}
 				UsersOnl.Push(newOnline)
-				UsersOnl.pushOnlineToClient(ChanForWS)
+				UsersOnl.pushOnlineToClient()
 
 			}
 
 		default:
 			// ignore mess
-			fmt.Println("Chat, type messages incorrect: ", letter.LetterType)
+			fmt.Println("Chat, type messages incorrect: ", let.LetterType)
 
 		}
 	}

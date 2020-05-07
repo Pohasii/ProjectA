@@ -3,7 +3,6 @@ package chat
 import (
 	"encoding/json"
 	"log"
-	ws "projecta/wsserver"
 )
 
 type UserOnline struct {
@@ -43,14 +42,17 @@ func (u *UsersOnline) GetAllUsersID() []int {
 	return IDs
 }
 
-func (u *UsersOnline) pushOnlineToClient(ChanForWS chan ws.Letter) {
+func (u *UsersOnline) pushOnlineToClient() {
 
 	jsonData, err := json.Marshal(*u)
 	if err != nil {
 		log.Printf("error: %v", err)
-		// break
 	}
 	for _, val := range *u {
-		ChanForWS <- ws.Letter(Letter{val.ID, "2004", string(jsonData)})
+		send, err := json.Marshal(Letter{val.ID, "2004", string(jsonData)})
+		if err != nil {
+			log.Printf("error: %v", err)
+		}
+		FromChatChan <- send
 	}
 }

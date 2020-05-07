@@ -2,6 +2,7 @@ package wsserver
 
 import (
 	"bytes"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -93,12 +94,15 @@ func (c *Client) readPump() {
 		}
 
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-
 		lettToStr := string(message)
 		typeLett := lettToStr[0:4]
 		letter := lettToStr[4:]
 
-		InChan <- Letter{c.ID, typeLett, letter}
+		mes, err := json.Marshal(Letter{c.ID, typeLett, letter})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		FromConnChan <- mes
 	}
 }
 

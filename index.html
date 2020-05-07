@@ -10,9 +10,12 @@ window.addEventListener("load", function(evt) {
     var ws;
     var print = function(message) {
         var d = document.createElement("div");
+        var date = new Date();
+        message = date.toLocaleTimeString() + " " + message
         d.innerHTML = message;
         d.className = "mes"
-        output.appendChild(d);
+        output.insertBefore(d, output.firstChild)
+        // output.appendChild(d);
     };
     document.getElementById("open").onclick = function(evt) {
         if (ws) {
@@ -57,7 +60,7 @@ window.addEventListener("load", function(evt) {
   .chatWindow {
     height: 100%;
     max-height: 790px;
-    width: 300px; /* Ширина блока */
+    width: 500px; /* Ширина блока */
     /* overflow: scroll; /* Добавляем полосы прокрутки */
     overflow: auto; /* Полоса прокрутки при необходимости */ 
     /* background: #fc0; /* Цвет фона */

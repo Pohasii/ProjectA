@@ -3,6 +3,7 @@ package wsserver
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -127,6 +128,12 @@ func (c *Connections) PushOnlineClientsToChat() {
 		if err != nil {
 			fmt.Println("GetOnlineClients: ", err)
 		}
-		InChan <- Letter{87654321, "2550", string(online)}
+
+		mes, err := json.Marshal(Letter{87654321, "2550", string(online)})
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		FromConnChan <- mes
 	}
 }
