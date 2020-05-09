@@ -21,6 +21,11 @@ const (
 	// useing in client/writePump()
 	СheckingMessages = 25
 
+	// TimeForAuth - Time  For Auth
+	// useing in connections/func (c *Connections) Add
+	TimeForAuth = 10000
+
+
 	// MaxConnections - max connections clients
 	// using in:
 	// clients/CleanOffConn()

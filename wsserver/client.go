@@ -19,7 +19,8 @@ type Client struct {
 	ID     int
 	Status bool
 	Remove bool
-	Nick   string
+	Auth   bool
+	// Nick   string
 }
 
 func (c *Client) writePump() {
@@ -32,6 +33,12 @@ func (c *Client) writePump() {
 		c.Conn.Close()
 		c.Status = false
 		close(c.Send)
+		
+		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		FromConnChan <- mes
 	}()
 
 	for {
@@ -79,6 +86,12 @@ func (c *Client) readPump() {
 	defer func() {
 		c.Conn.Close()
 		c.Status = false
+
+		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
+		if err != nil {
+			log.Fatalln(err)
+		}
+		FromConnChan <- mes
 	}()
 
 	c.Conn.SetReadLimit(maxMessageSize)
@@ -97,6 +110,16 @@ func (c *Client) readPump() {
 		lettToStr := string(message)
 		typeLett := lettToStr[0:4]
 		letter := lettToStr[4:]
+
+		if (*c).Auth == false && typeLett != "1001" {
+
+			mes, err := json.Marshal(struct{ Failed string }{"You are not auth"})
+			if err != nil {
+				log.Fatalln(err)
+			}
+			c.Send <- mes
+			continue
+		}
 
 		mes, err := json.Marshal(Letter{c.ID, typeLett, letter})
 		if err != nil {

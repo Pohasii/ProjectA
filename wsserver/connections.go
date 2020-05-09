@@ -1,9 +1,7 @@
 package wsserver
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -28,7 +26,15 @@ func (c *Connections) Add(conn *websocket.Conn) {
 	Client.Status = true
 	*c = append(*c, Client)
 	lastID++
-	c.PushOnlineClientsToChat()
+	go func() {
+		time.Sleep(TimeForAuth * time.Millisecond)
+		if (*c)[Client.ID].Auth == false {
+			(*c)[Client.ID].Conn.Close()
+			(*c)[Client.ID].Status = false
+			close((*c)[Client.ID].Send)
+		}
+	}()
+	// c.PushOnlineClientsToChat()
 }
 
 // GetClients - func GetClients() Clients
@@ -81,14 +87,12 @@ func (c *Connections) CleanOffConn() {
 			}
 			if len(thisdel) > 0 {
 				for _, ID := range thisdel {
-					// fmt.Println("before del: ", *c)
 					(*c).DelByID(ID)
-					// fmt.Println("after del: ", *c)
 				}
 
 				fmt.Println("remove bad connections: ", thisdel)
 				thisdel = make([]int, 0, MaxConnections)
-				c.PushOnlineClientsToChat()
+				// c.PushOnlineClientsToChat()
 			}
 		}
 	}
@@ -109,31 +113,25 @@ func (c *Connections) GetOfflineClient() []int {
 
 }
 
-type UsersOnline []UserOnline
-type UserOnline struct {
-	ID   int    `json:"id"`
-	Nick string `json:"n"`
-}
-
 // PushOnlineClientsToChat - return ids offline client
-func (c *Connections) PushOnlineClientsToChat() {
-	TheseOn := make(UsersOnline, 0, MaxConnections)
-	if len(*c) > 0 {
-		for i := range *c {
-			if (*c)[i].Status == true {
-				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID, (*c)[i].Nick})
-			}
-		}
-		online, err := json.Marshal(TheseOn)
-		if err != nil {
-			fmt.Println("GetOnlineClients: ", err)
-		}
-
-		mes, err := json.Marshal(Letter{87654321, "2550", string(online)})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		FromConnChan <- mes
-	}
-}
+//func (c *Connections) PushOnlineClientsToChat() {
+//	TheseOn := make(UsersOnline, 0, MaxConnections)
+//	if len(*c) > 0 {
+//		for i := range *c {
+//			if (*c)[i].Status == true {
+//				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID})
+//			}
+//		}
+//		online, err := json.Marshal(TheseOn)
+//		if err != nil {
+//			fmt.Println("GetOnlineClients: ", err)
+//		}
+//
+//		mes, err := json.Marshal(Letter{87654321, "2550", string(online)})
+//		if err != nil {
+//			log.Fatalln(err)
+//		}
+//
+//		FromConnChan <- mes
+//	}
+//}

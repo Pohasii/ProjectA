@@ -7,13 +7,14 @@ import (
 	"log"
 	"net/http"
 
+	// "crypto/tls"
 	"github.com/gorilla/websocket"
 )
 
-var OutChan chan []byte = make(chan []byte, 500)
+var OutChan chan []byte = make(chan []byte, 1000)
 
 // var InChan chan Letter = make(chan Letter, 500)
-var FromConnChan chan []byte = make(chan []byte, 500)
+var FromConnChan chan []byte = make(chan []byte, 1000)
 
 func GetOutChan() chan []byte {
 	return OutChan
@@ -64,14 +65,18 @@ func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
 
 	// fmt.Println("OutChan: ", OutChan, "FromConnChan:  ", FromConnChan)
 	go Conns.CleanOffConn()
-	go sortingForUsers()
+	go router() //sortingForUsers()
 
 	flag.Parse()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 		ServeWs(w, r, &Conns)
 	})
 
 	var addr = flag.String("addr", Addr, "http service address")
+
+	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
+	// err := http.ListenAndServe(*addr, nil)
 	err := http.ListenAndServe(*addr, nil) // *addr
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -80,16 +85,43 @@ func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
 }
 
 // sortingForUsers - func for letter sorting for clients
-func sortingForUsers() { // addFor
+//func sortingForUsers() { // addFor
+//	for let := range OutChan {
+//		letter := Letter{}
+//		err := json.Unmarshal(let, &letter)
+//		if err != nil {
+//			log.Fatalln(err)
+//		}
+//		for _, conn := range Conns {
+//			if conn.ID == letter.ClientID && conn.Status != false {
+//				conn.Send <- []byte(letter.LetterType + letter.Scroll)
+//			}
+//		}
+//	}
+//}
+
+
+func router () {
 	for let := range OutChan {
 		letter := Letter{}
 		err := json.Unmarshal(let, &letter)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		for _, conn := range Conns {
-			if conn.ID == letter.ClientID && conn.Status != false {
-				conn.Send <- []byte(letter.LetterType + letter.Scroll)
+
+		switch letter.LetterType {
+		case "1901":
+			if Conns[letter.ClientID].Status == false {
+				Conns.DelByID(letter.ClientID)
+				fmt.Println("Remove connection:", letter.ClientID)
+			}
+		case "1902":
+			Conns[letter.ClientID].Auth = true
+		default:
+			for _, conn := range Conns {
+				if conn.ID == letter.ClientID && conn.Status != false {
+					conn.Send <- []byte(letter.LetterType + letter.Scroll)
+				}
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import (
 
 type UserOnline struct {
 	ID   int    `json:"id"`
-	Nick string `json:"n"`
+	Nick string `json:"nick"`
 }
 
 type UsersOnline []UserOnline

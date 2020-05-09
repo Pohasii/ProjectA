@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	ch "projecta/chat"
+	cl "projecta/client"
+	vr "projecta/verification"
 	ws "projecta/wsserver"
-	"strings"
 )
 
 func main() {
@@ -15,30 +15,43 @@ func main() {
 	// init address for WS Server
 	func() {
 
-		var ip string
-		var port string
-		fmt.Print("Enter IP:")
-		fmt.Fscan(os.Stdin, &ip)
-		fmt.Print("Enter Port:")
-		fmt.Fscan(os.Stdin, &port)
-		adr := strings.Join([]string{ip, port}, ":")
-		ws.Addr = adr
-		fmt.Println("The server started at this address: ", adr)
+		// var ip string
+		// var port string
+		// fmt.Print("Enter IP:")
+		// fmt.Fscan(os.Stdin, &ip)
+		// fmt.Print("Enter Port:")
+		// fmt.Fscan(os.Stdin, &port)
+		// adr := strings.Join([]string{ip, port}, ":")
+		ws.Addr = "192.168.0.65:55443" // adr
+		// fmt.Println("The server started at this address: ", adr)
 	}()
 
-	// =====================================================================
-	// ws server
-	Clients := &ws.Conns
+	// init services
+	func() {
+		// ================================= auth
+		go vr.Server()
+		// cl.Start()
 
+		// ================================= client
+		go cl.Start()
+
+		// =====================================================================
+		// ws server
+		go ws.Start()
+
+		// =====================================================================
+		// Chats
+		ch.Start()
+	}()
+
+	// ===================================================================
+	// init channels
+
+	// websocket
 	ChanFromWS := ws.GetFromConnChan()
 	ChanForWS := ws.GetOutChan()
 
-	go ws.Start()
-
-	// =====================================================================
-	// Chats
-
-	ch.Start() //
+	// chat
 	InChatChan := ch.GetInChatChan()
 	FromChatChan := ch.GetFromChatChan()
 
@@ -48,10 +61,9 @@ func main() {
 			ChanForWS <- val
 		}
 	}()
+
 	// =====================================================================
 	// router sms
-
-	//fmt.Println(ws.LettersFrom)
 
 	for let := range ChanFromWS {
 		go func() {
@@ -59,50 +71,27 @@ func main() {
 			letter := letterType{}
 			err := json.Unmarshal(let, &letter)
 			if err != nil {
-				log.Fatalln("main.go: 65 line: ", err)
-			}
-
-			if letter.LetterType == "1001" {
-
-				scrollFrom := &registerNewUs{}
-				err := json.Unmarshal([]byte(letter.Scroll), &scrollFrom)
-				if err != nil {
-					log.Println(err)
-				}
-
-				// res := Clients.Add(ws.LettersFrom[i].ClientID, scrollFrom.Nick)
-				(*Clients)[letter.ClientID].Nick = scrollFrom.Nick
-
-				jsonData, err := json.Marshal(registerNewUsTrue{letter.ClientID, (*Clients)[letter.ClientID].Status})
-				if err != nil {
-					log.Printf("error: %v", err)
-					// break
-				}
-
-				send, err := json.Marshal(letterType{letter.ClientID, "1001", string(jsonData)})
-				if err != nil {
-					log.Println(err)
-				}
-
-				// fmt.Println(send)
-				ChanForWS <- send
-				(*Clients).PushOnlineClientsToChat()
+				log.Fatalln("main.go: ", err)
 			}
 
 			switch letter.LetterType[0:1] {
 
 			case "1":
 				// auth
-				fmt.Println("auth in dev")
+				fmt.Print("send to auth: ")
+				fmt.Println(letter.Scroll)
+
 			case "2":
+				// chat
 				fmt.Print("send to chat: ")
 				fmt.Println(letter.Scroll)
 
-				send, err := json.Marshal(letter)
-				if err != nil {
-					log.Println(err)
-				}
-				InChatChan <- send // ch.Letter(letter)
+				// send, err := json.Marshal(letter)
+				// if err != nil {
+				// 	log.Println(err)
+				// }
+
+				InChatChan <- ToByte(letter) // send // ch.Letter(letter)
 			default:
 				fmt.Println("incorrect message from userID: ", letter.ClientID)
 			}
@@ -112,16 +101,24 @@ func main() {
 }
 
 type registerNewUs struct {
-	Nick string `json:"n"`
+	Nick string `json:"nick"`
 }
 
 type registerNewUsTrue struct {
-	ID     int  `json:"id"`
-	Status bool `json:"s"`
+	ID int `json:"id"`
+	// Status bool `json:"status"`
 }
 
 type letterType struct {
 	ClientID   int
 	LetterType string
 	Scroll     string
+}
+
+func ToByte(letter letterType) []byte {
+	send, err := json.Marshal(letter)
+	if err != nil {
+		log.Println(err)
+	}
+	return send
 }
