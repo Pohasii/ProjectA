@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	// "gopkg.in/yaml.v2"
-	// "os"
 	ch "projecta.com/me/chat"
 	cl "projecta.com/me/client"
 	"projecta.com/me/setenv"
@@ -17,7 +15,7 @@ func main() {
 
 	// init address for WS Server
 	func() {
-		fmt.Println("The server started!")
+		fmt.Println("Starting..!")
 		// upload ENV form config.yml
 		setenv.SetupConfigToENV()
 	}()
@@ -54,9 +52,6 @@ func main() {
 
 	// reload message from chat
 	go func() {
-		//for val := range FromChatChan {
-		//	ChanForWS <- val
-		//}
 		for {
 			select {
 			case let := <- FromChatChan:
@@ -79,9 +74,10 @@ func main() {
 
 	}()
 
+	fmt.Println("The server started!")
+
 	// =====================================================================
 	// router sms
-
 	for let := range ChanFromWS {
 		go func() {
 
@@ -103,11 +99,6 @@ func main() {
 				fmt.Print("send to chat: ")
 				fmt.Println(letter.Scroll)
 
-				// send, err := json.Marshal(letter)
-				// if err != nil {
-				// 	log.Println(err)
-				// }
-
 				InChatChan <- ToByte(letter) // send // ch.Letter(letter)
 			default:
 				fmt.Println("incorrect message from userID: ", letter.ClientID)
@@ -116,15 +107,6 @@ func main() {
 	}
 
 }
-
-//type registerNewUs struct {
-//	Nick string `json:"nick"`
-//}
-//
-//type registerNewUsTrue struct {
-//	ID int `json:"id"`
-//	// Status bool `json:"status"`
-//}
 
 type letterType struct {
 	ClientID   int

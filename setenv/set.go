@@ -25,9 +25,10 @@ func SetupConfigToENV () {
 	os.Setenv("WebsocketPORT", config.WsServer.Port)
 	os.Setenv("AuthenticationIP", config.AuthServer.Host)
 	os.Setenv("AuthenticationPORT", config.AuthServer.Port)
-	os.Setenv("DataBaseIP", config.WsServer.Host)
-	os.Setenv("DataBasePORT", config.WsServer.Port)
+	os.Setenv("DataBaseIP", config.DbServer.Host)
+	os.Setenv("DataBasePORT", config.DbServer.Port)
 
+	fmt.Println("ENV setup")
 }
 
 // Config struct for webapp config

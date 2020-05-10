@@ -2,6 +2,7 @@ package verification
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,8 @@ func Server() {
 	router.HandleFunc("/authorization", Authorization).Methods("POST")
 	router.HandleFunc("/registration", Registration).Methods("POST")
 	// router.HandleFunc("/<your-url>", <function-name>).Methods("<method>")
+
+	fmt.Println("Verification's service started at the ", os.Getenv("AuthenticationIP")+":"+os.Getenv("AuthenticationPORT"))
 
 	err := http.ListenAndServe(os.Getenv("AuthenticationIP")+":"+os.Getenv("AuthenticationPORT"), router) // *addr
 	if err != nil {

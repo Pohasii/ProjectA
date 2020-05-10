@@ -23,8 +23,8 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 	if Credential.Login == "" && Credential.Password == "" {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login incorrect"})
 	} else {
-
-		connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+		connDb.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
+		// connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 		defer connDb.close()
 
 		count, err := connDb.Collection.CountDocuments(connDb.ctx, bson.D{{"login", Credential.Login}})

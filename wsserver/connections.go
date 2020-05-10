@@ -112,26 +112,3 @@ func (c *Connections) GetOfflineClient() []int {
 	return TheseOff
 
 }
-
-// PushOnlineClientsToChat - return ids offline client
-//func (c *Connections) PushOnlineClientsToChat() {
-//	TheseOn := make(UsersOnline, 0, MaxConnections)
-//	if len(*c) > 0 {
-//		for i := range *c {
-//			if (*c)[i].Status == true {
-//				TheseOn = append(TheseOn, UserOnline{(*c)[i].ID})
-//			}
-//		}
-//		online, err := json.Marshal(TheseOn)
-//		if err != nil {
-//			fmt.Println("GetOnlineClients: ", err)
-//		}
-//
-//		mes, err := json.Marshal(Letter{87654321, "2550", string(online)})
-//		if err != nil {
-//			log.Fatalln(err)
-//		}
-//
-//		FromConnChan <- mes
-//	}
-//}

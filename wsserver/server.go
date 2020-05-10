@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	// "crypto/tls"
 	"github.com/gorilla/websocket"
@@ -27,7 +28,6 @@ func GetFromConnChan() chan []byte {
 // Conns - all connection clients
 var Conns Connections = make(Connections, 0, MaxConnections)
 
-// 192.168.0.65
 var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
@@ -61,11 +61,10 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 
 // Start func Start(client *Client)
 // start http Websocket server
-func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
+func Start() {
 
-	// fmt.Println("OutChan: ", OutChan, "FromConnChan:  ", FromConnChan)
 	go Conns.CleanOffConn()
-	go router() //sortingForUsers()
+	go router()
 
 	flag.Parse()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -73,31 +72,15 @@ func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
 		ServeWs(w, r, &Conns)
 	})
 
+	fmt.Println("The websocket's server started at the ", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"))
+
 	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
-	// err := http.ListenAndServe(*addr, nil)
 	err := http.ListenAndServe(*addr, nil) // *addr
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 
 }
-
-// sortingForUsers - func for letter sorting for clients
-//func sortingForUsers() { // addFor
-//	for let := range OutChan {
-//		letter := Letter{}
-//		err := json.Unmarshal(let, &letter)
-//		if err != nil {
-//			log.Fatalln(err)
-//		}
-//		for _, conn := range Conns {
-//			if conn.ID == letter.ClientID && conn.Status != false {
-//				conn.Send <- []byte(letter.LetterType + letter.Scroll)
-//			}
-//		}
-//	}
-//}
-
 
 func router () {
 	for let := range OutChan {

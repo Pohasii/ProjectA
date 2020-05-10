@@ -83,9 +83,7 @@ func (c *Client) readPump() {
 	defer func() {
 		c.Conn.Close()
 		c.Status = false
-		//if c.Send != nil {
-		//	close(c.Send)
-		//}
+
 		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
 		if err != nil {
 			log.Println(err)

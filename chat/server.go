@@ -24,7 +24,7 @@ var UsersOnl UsersOnline = make(UsersOnline, 0, MaxConnections)
 func Start() {
 
 	go Router()
-	fmt.Println("init chat")
+	fmt.Println("Chat's service started")
 
 }
 

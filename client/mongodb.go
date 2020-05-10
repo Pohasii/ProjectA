@@ -27,6 +27,7 @@ func (db *mongodb) setCollection(name string) {
 }
 
 func (db *mongodb) setCtx() {
+	//ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	ctx := context.TODO() // ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err := db.conn.Connect(ctx)
 	if err != nil {
@@ -58,11 +59,6 @@ func (db *mongodb) initConnDB(server, database, collection string) {
 
 func (db *mongodb) close() {
 	err := db.db.Client().Disconnect(db.ctx)
-	if err != nil {
-		log.Println(err)
-	}
-
-	err = db.conn.Disconnect(db.ctx)
 	if err != nil {
 		log.Println(err)
 	}

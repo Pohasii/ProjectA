@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +29,8 @@ func Authorization(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login is incorrect"})
 	} else {
 
-		connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+		// connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+		connDb.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
 		defer connDb.close()
 
 		request := bson.D{
@@ -46,6 +48,7 @@ func Authorization(w http.ResponseWriter, r *http.Request) {
 
 			h := md5.New()
 			time := strconv.Itoa(int(time.Now().Unix()))
+			io.WriteString(h, time)
 			Client.Token = hex.EncodeToString(h.Sum([]byte(time)))
 
 			update := bson.D{

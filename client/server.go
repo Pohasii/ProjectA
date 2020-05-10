@@ -28,10 +28,13 @@ var DbConn mongodb
 var Profiles Clients = make(Clients)
 
 func initDB () {
-	DbConn.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+	DbConn.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
+	// DbConn.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 }
 
 func Start() {
+
+	fmt.Println("Client's service started")
 
 	initDB()
 	defer DbConn.close()

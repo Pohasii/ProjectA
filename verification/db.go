@@ -64,11 +64,6 @@ func (db *mongodb) close() {
 		log.Println(err)
 	}
 
-	err = db.conn.Disconnect(db.ctx)
-	if err != nil {
-		log.Println(err)
-	}
-
 	db.conn = nil
 	db.ctx = nil
 	db.db = nil
