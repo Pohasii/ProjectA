@@ -86,29 +86,25 @@ func Router() {
 
 		case "2005":
 			// Search By  Nick
-			mes := &SerachByNick{}
-			err := json.Unmarshal([]byte(let.Scroll), &mes)
-			if err != nil {
-				log.Println(err)
-			}
-
-			user, res := UsersOnl.GetUserByNick(mes.Nick)
-
-			if res {
-				mes.ID = user.ID
-				jsonData, err := json.Marshal(mes)
-				if err != nil {
-					log.Printf("error: %v", err)
-					// break
-				}
-
-				send, err := json.Marshal(Letter{let.ClientID, let.LetterType, string(jsonData)})
-				if err != nil {
-					log.Printf("error: %v", err)
-				}
-				FromChatChan <- send
-			}
-
+		//	mes := &SerachByNick{}
+		//	err := json.Unmarshal([]byte(let.Scroll), &mes)
+		//	if err != nil {
+		//		log.Println(err)
+		//	}
+		//	user, res := UsersOnl.GetUserByNick(mes.Nick)
+		//	if res {
+		//		mes.ID = user.ID
+		//		jsonData, err := json.Marshal(mes)
+		//		if err != nil {
+		//			log.Printf("error: %v", err)
+		//			// break
+		//		}
+		//		send, err := json.Marshal(Letter{let.ClientID, let.LetterType, string(jsonData)})
+		//		if err != nil {
+		//			log.Printf("error: %v", err)
+		//		}
+		//		FromChatChan <- send
+		//	}
 		case "2550":
 			//only check
 			if let.ClientID == 87654321 {

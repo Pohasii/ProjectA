@@ -34,10 +34,8 @@ func (c *Connections) Add(conn *websocket.Conn) {
 			if (*c)[Client.ID].Send != nil {
 				close((*c)[Client.ID].Send)
 			}
-
 		}
 	}()
-	// c.PushOnlineClientsToChat()
 }
 
 // GetClients - func GetClients() Clients
@@ -95,7 +93,6 @@ func (c *Connections) CleanOffConn() {
 
 				fmt.Println("remove bad connections: ", thisdel)
 				thisdel = make([]int, 0, MaxConnections)
-				// c.PushOnlineClientsToChat()
 			}
 		}
 	}

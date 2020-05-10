@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -23,7 +24,7 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login incorrect"})
 	} else {
 
-		connDb.initConnDB("mongodb://localhost:27017", "ProjectA", "users")
+		connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 		defer connDb.close()
 
 		count, err := connDb.Collection.CountDocuments(connDb.ctx, bson.D{{"login", Credential.Login}})

@@ -20,21 +20,16 @@ type Client struct {
 	Status bool
 	Remove bool
 	Auth   bool
-	// Nick   string
 }
 
 func (c *Client) writePump() {
 
 	ticker := time.NewTicker(pingPeriod)
-	// CheckTicker := time.Tick(СheckingMessages * time.Millisecond)
 
 	defer func() {
 		ticker.Stop()
 		c.Conn.Close()
 		c.Status = false
-		//if c.Send != nil {
-		//	close(c.Send)
-		//}
 		
 		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
 		if err != nil {

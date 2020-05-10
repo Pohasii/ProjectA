@@ -10,6 +10,7 @@ type UserOnline struct {
 }
 
 type UsersOnline []UserOnline
+// type UsersOnline map[int]UserOnline
 
 func (u *UsersOnline) Push(new UsersOnline) {
 	*u = new

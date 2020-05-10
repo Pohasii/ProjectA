@@ -73,8 +73,6 @@ func Start() { // (OutChan chan []byte, FromConnChan chan []byte)
 		ServeWs(w, r, &Conns)
 	})
 
-	var addr = flag.String("addr", Addr, "http service address")
-
 	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
 	// err := http.ListenAndServe(*addr, nil)
 	err := http.ListenAndServe(*addr, nil) // *addr

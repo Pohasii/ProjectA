@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -16,7 +17,7 @@ func Server() {
 	router.HandleFunc("/registration", Registration).Methods("POST")
 	// router.HandleFunc("/<your-url>", <function-name>).Methods("<method>")
 
-	err := http.ListenAndServe("192.168.0.65:55442", router) // *addr
+	err := http.ListenAndServe(os.Getenv("AuthenticationIP")+":"+os.Getenv("AuthenticationPORT"), router) // *addr
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

@@ -4,26 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	ch "projecta/chat"
-	cl "projecta/client"
-	vr "projecta/verification"
-	ws "projecta/wsserver"
+	// "gopkg.in/yaml.v2"
+	// "os"
+	ch "projecta.com/me/chat"
+	cl "projecta.com/me/client"
+	"projecta.com/me/setenv"
+	vr "projecta.com/me/verification"
+	ws "projecta.com/me/wsserver"
 )
 
 func main() {
 
 	// init address for WS Server
 	func() {
-
-		// var ip string
-		// var port string
-		// fmt.Print("Enter IP:")
-		// fmt.Fscan(os.Stdin, &ip)
-		// fmt.Print("Enter Port:")
-		// fmt.Fscan(os.Stdin, &port)
-		// adr := strings.Join([]string{ip, port}, ":")
-		ws.Addr = "192.168.0.65:55443" // adr
-		fmt.Println("The server started at this address: ") // , adr
+		fmt.Println("The server started!")
+		// upload ENV form config.yml
+		setenv.SetupConfigToENV()
 	}()
 
 	// init services
@@ -121,14 +117,14 @@ func main() {
 
 }
 
-type registerNewUs struct {
-	Nick string `json:"nick"`
-}
-
-type registerNewUsTrue struct {
-	ID int `json:"id"`
-	// Status bool `json:"status"`
-}
+//type registerNewUs struct {
+//	Nick string `json:"nick"`
+//}
+//
+//type registerNewUsTrue struct {
+//	ID int `json:"id"`
+//	// Status bool `json:"status"`
+//}
 
 type letterType struct {
 	ClientID   int
@@ -143,3 +139,7 @@ func ToByte(letter letterType) []byte {
 	}
 	return send
 }
+
+
+
+
