@@ -1,7 +1,6 @@
 package client
 
 import (
-	"encoding/json"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 )
@@ -52,17 +51,53 @@ func CheckNick (nick string) bool {
 	if count > 0 {
 		return false
 	}
-
 	return true
-
 }
 
-func SetNick () {
+func SetNick (nick string, ID int) bool {
 	DbConn.setCollection("users")
 
-	count, err := DbConn.Collection.CountDocuments(DbConn.ctx, bson.D{{"login", Credential.Login}})
-	if err != nil {
-		log.Println("err:", err)
-		json.NewEncoder(w).Encode(Failed{"Something went wrong. Please, try again."})
+	request := bson.D{
+		{"id", ID},
 	}
+
+	update := bson.D{
+		{"$set", bson.D{
+			{"nick", nick},
+		}},
+	}
+
+	_, err := DbConn.Collection.UpdateOne(DbConn.ctx, request, update)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func GetProfile (token string) GetProf {
+	DbConn.setCollection("users")
+
+	Client := GetProf{}
+
+	res := DbConn.Collection.FindOne(DbConn.ctx, bson.D{{"token", token}}).Decode(&Client)
+	if res != nil {
+		log.Println("res:", res)
+	}
+
+	return Client
+}
+
+func GetProfileByID (ID int) GetProf {
+	DbConn.setCollection("users")
+
+	Client := GetProf{}
+
+	res := DbConn.Collection.FindOne(DbConn.ctx, bson.D{{"id", ID}}).Decode(&Client)
+	if res != nil {
+		log.Println("res:", res)
+	}
+
+	return Client
 }

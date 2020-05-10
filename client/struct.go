@@ -21,17 +21,16 @@ type SetNick1002 struct {
 }
 
 type SetNick1002Err struct {
-	text string `json:"text"`
+	Text string `json:"text"`
 }
 
 type SetNick1002Succ struct {
-	text string `json:"text"`
+	Result bool `json:"result"`
 }
 
 // ===================== First Upload
-type FirstUpload struct {
+type GetProf struct {
 	ID        int    `json:"id"`
 	Nick      string `json:"nick"`
-	Token     string `json:"token"`
 	Friends   []int  `json:"friends"`
 }

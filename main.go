@@ -23,24 +23,21 @@ func main() {
 		// fmt.Fscan(os.Stdin, &port)
 		// adr := strings.Join([]string{ip, port}, ":")
 		ws.Addr = "192.168.0.65:55443" // adr
-		// fmt.Println("The server started at this address: ", adr)
+		fmt.Println("The server started at this address: ") // , adr
 	}()
 
 	// init services
 	func() {
 		// ================================= auth
 		go vr.Server()
-		// cl.Start()
 
 		// ================================= client
 		go cl.Start()
 
-		// =====================================================================
-		// ws server
+		// ================================= ws server
 		go ws.Start()
 
-		// =====================================================================
-		// Chats
+		// ================================= Chats
 		ch.Start()
 	}()
 
@@ -55,11 +52,35 @@ func main() {
 	InChatChan := ch.GetInChatChan()
 	FromChatChan := ch.GetFromChatChan()
 
+	// client
+	ChanFromClient := cl.GetChanFromClient()
+	ChanInClient := cl.GetChanInClient()
+
 	// reload message from chat
 	go func() {
-		for val := range FromChatChan {
-			ChanForWS <- val
+		//for val := range FromChatChan {
+		//	ChanForWS <- val
+		//}
+		for {
+			select {
+			case let := <- FromChatChan:
+				ChanForWS <- let
+			case let := <- ChanFromClient:
+				letter := letterType{}
+				err := json.Unmarshal(let, &letter)
+				if err != nil {
+					log.Fatalln("main.go: ", err)
+				}
+				switch letter.LetterType {
+				case "2550":
+					InChatChan <- let
+				default:
+					ChanForWS <- let
+				}
+
+			}
 		}
+
 	}()
 
 	// =====================================================================
@@ -80,7 +101,7 @@ func main() {
 				// auth
 				fmt.Print("send to auth: ")
 				fmt.Println(letter.Scroll)
-
+				ChanInClient <- ToByte(letter)
 			case "2":
 				// chat
 				fmt.Print("send to chat: ")

@@ -31,7 +31,10 @@ func (c *Connections) Add(conn *websocket.Conn) {
 		if (*c)[Client.ID].Auth == false {
 			(*c)[Client.ID].Conn.Close()
 			(*c)[Client.ID].Status = false
-			close((*c)[Client.ID].Send)
+			if (*c)[Client.ID].Send != nil {
+				close((*c)[Client.ID].Send)
+			}
+
 		}
 	}()
 	// c.PushOnlineClientsToChat()

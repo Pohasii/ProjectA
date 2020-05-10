@@ -85,7 +85,7 @@ func Router() {
 			FromChatChan <- send
 
 		case "2005":
-			//only check
+			// Search By  Nick
 			mes := &SerachByNick{}
 			err := json.Unmarshal([]byte(let.Scroll), &mes)
 			if err != nil {

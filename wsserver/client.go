@@ -32,11 +32,13 @@ func (c *Client) writePump() {
 		ticker.Stop()
 		c.Conn.Close()
 		c.Status = false
-		close(c.Send)
+		//if c.Send != nil {
+		//	close(c.Send)
+		//}
 		
 		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 		FromConnChan <- mes
 	}()
@@ -86,10 +88,12 @@ func (c *Client) readPump() {
 	defer func() {
 		c.Conn.Close()
 		c.Status = false
-
+		//if c.Send != nil {
+		//	close(c.Send)
+		//}
 		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 		FromConnChan <- mes
 	}()
@@ -115,7 +119,7 @@ func (c *Client) readPump() {
 
 			mes, err := json.Marshal(struct{ Failed string }{"You are not auth"})
 			if err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 			c.Send <- mes
 			continue
@@ -123,7 +127,7 @@ func (c *Client) readPump() {
 
 		mes, err := json.Marshal(Letter{c.ID, typeLett, letter})
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 		FromConnChan <- mes
 	}

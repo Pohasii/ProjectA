@@ -2,12 +2,10 @@ package client
 
 import (
 	"context"
-	"log"
-	"time"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 )
 
 type mongodb struct {
@@ -29,7 +27,7 @@ func (db *mongodb) setCollection(name string) {
 }
 
 func (db *mongodb) setCtx() {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx := context.TODO() // ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err := db.conn.Connect(ctx)
 	if err != nil {
 		log.Println(err)
