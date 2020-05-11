@@ -63,14 +63,19 @@ func (c *Connections) GetClientsID(ID int) []int {
 // DelByID - delete client from Clients array by id
 // expected id (int)
 func (c *Connections) DelByID(id int) {
-	switch id {
-	case 0:
-		*c = append((*c)[1:])
-	case len(*c):
-		*c = append((*c)[0 : id-1])
-	default:
-		*c = append((*c)[:id], (*c)[id+1:]...)
+	for i, val := range *c {
+		if val.ID == id {
+			switch i {
+			case 0:
+				*c = append((*c)[1:])
+			case len(*c)-1:
+				*c = append((*c)[0 : id-1])
+			default:
+				*c = append((*c)[:id], (*c)[id+1:]...)
+			}
+		}
 	}
+
 }
 
 // CleanOffConn - remove client with off status

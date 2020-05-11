@@ -1,8 +1,6 @@
 package wsserver
 
 import (
-	"flag"
-	"os"
 	"time"
 )
 
@@ -10,7 +8,6 @@ import (
 // using in:
 // server/Start()
 // var Addr string
-var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")
 
 const (
 	// ClearPer - Сhecking for messages to send

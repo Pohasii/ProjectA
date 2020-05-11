@@ -54,13 +54,13 @@ func main() {
 	go func() {
 		for {
 			select {
-			case let := <- FromChatChan:
+			case let := <-FromChatChan:
 				ChanForWS <- let
-			case let := <- ChanFromClient:
+			case let := <-ChanFromClient:
 				letter := letterType{}
 				err := json.Unmarshal(let, &letter)
 				if err != nil {
-					log.Fatalln("main.go: ", err)
+					log.Println("main.go: ", err)
 				}
 				switch letter.LetterType {
 				case "2550":
@@ -68,7 +68,6 @@ func main() {
 				default:
 					ChanForWS <- let
 				}
-
 			}
 		}
 
@@ -84,7 +83,7 @@ func main() {
 			letter := letterType{}
 			err := json.Unmarshal(let, &letter)
 			if err != nil {
-				log.Fatalln("main.go: ", err)
+				log.Println("main.go: ", err)
 			}
 
 			switch letter.LetterType[0:1] {
@@ -121,7 +120,3 @@ func ToByte(letter letterType) []byte {
 	}
 	return send
 }
-
-
-
-

@@ -63,7 +63,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 // start http Websocket server
 func Start() {
 
-	go Conns.CleanOffConn()
+	// go Conns.CleanOffConn()
 	go router()
 
 	flag.Parse()
@@ -72,6 +72,7 @@ func Start() {
 		ServeWs(w, r, &Conns)
 	})
 
+	var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")
 	fmt.Println("The websocket's server started at the ", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"))
 
 	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
@@ -87,14 +88,14 @@ func router () {
 		letter := Letter{}
 		err := json.Unmarshal(let, &letter)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 
 		switch letter.LetterType {
 		case "1901":
 			if Conns[letter.ClientID].Status == false {
 				Conns.DelByID(letter.ClientID)
-				fmt.Println("Remove connection:", letter.ClientID)
+				fmt.Println("Remove connection: ", letter.ClientID)
 			}
 		case "1902":
 			Conns[letter.ClientID].Auth = true

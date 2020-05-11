@@ -6,3 +6,10 @@ type Letter struct {
 	LetterType string
 	Scroll     string
 }
+
+// Online struct for sent online
+type Online struct {
+	ConnID int    `json:"connid"`
+	UserID int    `json:"userid"`
+	Nick   string `json:"nick"`
+}

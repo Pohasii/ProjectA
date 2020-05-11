@@ -69,8 +69,10 @@ func Router() {
 				send := AuthSuccessful{true}
 				ChanFromClient <- toByte(Letter{let.ClientID, "1001",toJsonString(send)})
 				ChanFromClient <- toByte(Letter{let.ClientID, "1902","Change status"})
-
-				ChanFromClient <- toByte(Letter{87654321, "2550","{[]}"})
+				if profile.Nick != "" {
+					onl := Online{let.ClientID, profile.ID, profile.Nick}
+					ChanFromClient <- toByte(Letter{87654321, "2550",toJsonString(onl)})
+				}
 			} else {
 				send := AuthSuccessful{false}
 				ChanFromClient <- toByte(Letter{let.ClientID, "1001",toJsonString(send)})
@@ -90,6 +92,9 @@ func Router() {
 						if res := SetNick(nick.Nick,profile.ID); res {
 							send := SetNick1002Succ{true}
 							ChanFromClient <- toByte(Letter{let.ClientID, "1002",toJsonString(send)})
+
+							onl := Online{let.ClientID, profile.ID, profile.Nick}
+							ChanFromClient <- toByte(Letter{87654321, "2550",toJsonString(onl)})
 							break
 						} else {
 							send := SetNick1002Err{"Oops, failed"}
@@ -118,7 +123,9 @@ func Router() {
 			for _, profile := range Profiles {
 				if profile.connID == let.ClientID {
 					delete(Profiles, profile.ID)
-					fmt.Println("Client, Router: remove user id:", profile.connID)
+					fmt.Println("Client, Router: remove user id:", profile.ID)
+					onl := Online{profile.connID, profile.ID, profile.Nick}
+					ChanFromClient <- toByte(Letter{87654321, "2550",toJsonString(onl)})
 					break
 				}
 			}

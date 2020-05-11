@@ -35,8 +35,9 @@ func Router() {
 		let := Letter{}
 		err := json.Unmarshal(letter, &let)
 		if err != nil {
-			log.Fatalln(err)
+			log.Printf("error: %v", err)
 		}
+
 
 		switch let.LetterType {
 
@@ -109,13 +110,14 @@ func Router() {
 			//only check
 			if let.ClientID == 87654321 {
 
-				newOnline := make(UsersOnline, 0, 500)
+				newOnline := &UserOnline{}
 
 				err := json.Unmarshal([]byte(let.Scroll), &newOnline)
 				if err != nil {
-					fmt.Println(err)
+					log.Printf("error: %v", err)
 				}
-				UsersOnl.Push(newOnline)
+
+				UsersOnl.Push(*newOnline)
 				UsersOnl.pushOnlineToClient()
 
 			}
