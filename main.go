@@ -86,11 +86,13 @@ func main() {
 				log.Println("main.go: ", err)
 			}
 
+			fmt.Println("Сообщения из сокета: ", letter)
+
 			switch letter.LetterType[0:1] {
 
 			case "1":
-				// auth
-				fmt.Print("send to auth: ")
+				// client service
+				fmt.Print("send to client service: ")
 				fmt.Println(letter.Scroll)
 				ChanInClient <- ToByte(letter)
 			case "2":

@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	// "crypto/tls"
 	"github.com/gorilla/websocket"
 )
 

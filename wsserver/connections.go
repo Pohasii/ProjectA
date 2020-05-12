@@ -69,9 +69,9 @@ func (c *Connections) DelByID(id int) {
 			case 0:
 				*c = append((*c)[1:])
 			case len(*c)-1:
-				*c = append((*c)[0 : id-1])
+				*c = append((*c)[0 : i])
 			default:
-				*c = append((*c)[:id], (*c)[id+1:]...)
+				*c = append((*c)[:i], (*c)[i+1:]...)
 			}
 		}
 	}

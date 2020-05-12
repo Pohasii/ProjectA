@@ -6,6 +6,11 @@ type CheckErr struct {
 	Text string
 }
 
+// ErrorPattern - struct for answer error's
+type ErrorPattern struct {
+	Error string `json:"error"`
+}
+
 // ===================== auth
 type Auth1001 struct {
 	Token string `json:"token"`
@@ -33,4 +38,35 @@ type GetProf struct {
 	ID        int    `json:"id"`
 	Nick      string `json:"nick"`
 	Friends   []int  `json:"friends"`
+}
+
+// ===================== search by nick
+
+type GetByNick struct {
+	Nick string `json:"nick"`
+}
+
+type ResponseForSearchByNick struct {
+	ID int `json:"id"`
+	Nick string `json:"nick"`
+}
+
+// ===================== friend request
+
+type RequestFriend struct {
+	ID int `json:"id"`
+	Nick string `json:"nick"`
+}
+
+type FromFriendRequest struct {
+	ID int `json:"id"`
+	Request bool `json:"request"`
+}
+
+type removeFriend struct {
+	ID int `json:"id"`
+}
+
+type friends struct {
+	Friends []int `json:"friends"`
 }
