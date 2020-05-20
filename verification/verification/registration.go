@@ -2,11 +2,9 @@ package verification
 
 import (
 	"encoding/json"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
-	"os"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Registration(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +21,7 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 	if Credential.Login == "" && Credential.Password == "" {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login incorrect"})
 	} else {
-		connDb.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
+		connDb.initConnDB("mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false", "projecta", "users")
 		// connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 		defer connDb.close()
 

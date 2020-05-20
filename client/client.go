@@ -23,6 +23,15 @@ func (c *Profile) addToFriends (id int) {
 	(*c).Friends = append((*c).Friends, id)
 }
 
+func (c *Profile) CheckFriendByID (ID int) bool {
+	for _, friendID := range (*c).Friends {
+		if friendID == ID {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *Profile) removeFromFriends (id int) {
 
 	friends := (*c).Friends

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 )
 
 // ChanInClient - channel for message for client service
@@ -28,7 +27,8 @@ var DbConn mongodb
 var Profiles Clients = make(Clients)
 
 func initDB () {
-	DbConn.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
+	//"mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false"
+	DbConn.initConnDB( "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false", "projecta", "users")
 	// DbConn.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 }
 
@@ -127,6 +127,12 @@ func Router() {
 
 			user, checkErr := SearchByNick(req.Nick)
 			if checkErr.Code != 0 {
+
+				if CurUser, checkErr := Profiles.searchByConnID(let.ClientID); (CurUser.Nick == user.Nick) && checkErr.Code != 0 {
+					log.Println("the user search himself.")
+					continue
+				}
+
 				ChanFromClient <- toByte(Letter{let.ClientID, "1004",toJsonString(user)})
 			} else {
 				ChanFromClient <- toByte(Letter{let.ClientID, "1004",toJsonString(ErrorPattern{"Nothing found"})})
@@ -142,12 +148,24 @@ func Router() {
 				log.Println("Client, 1005: ", err)
 			}
 
+			user, checkErr := Profiles.searchByConnID(let.ClientID)
+
+			if (user.ID == req.ID) && checkErr.Code != 0 {
+				log.Println("user id for add to friend == id the user.")
+				continue
+			}
+
+			if user.CheckFriendByID(req.ID) {
+				log.Println("the friend added")
+				continue
+			}
+
 			// если true, то это запрос на  добавление
 			if req.Request {
 				// если это запрос на добавление, то мы находим того, кого хотят добавить и отправляем запрос
 				user, checkErr := Profiles.searchByConnID(let.ClientID)
 				if checkErr.Code != 0 {
-					send := RequestFriend{user.ID, user.Nick}
+					send := RequestFriend{user.ID, user.Nick, true}
 					ChanFromClient <- toByte(Letter{Profiles[req.ID].connID, "1005",toJsonString(send)})
 				}
 			} else {
@@ -180,10 +198,10 @@ func Router() {
 					}
 
 					if status.requester && status.responder {
-						send := RequestFriend{user.ID, user.Nick}
+						send := RequestFriend{user.ID, user.Nick, false}
 						ChanFromClient <- toByte(Letter{Profiles[req.ID].connID, "1005",toJsonString(send)})
 
-						send = RequestFriend{req.ID, Profiles[req.ID].Nick}
+						send = RequestFriend{req.ID, Profiles[req.ID].Nick, false}
 						ChanFromClient <- toByte(Letter{Profiles[user.ID].connID, "1005",toJsonString(send)})
 					}
 				}

@@ -56,6 +56,7 @@ type ResponseForSearchByNick struct {
 type RequestFriend struct {
 	ID int `json:"id"`
 	Nick string `json:"nick"`
+	Response bool `json:"response"`
 }
 
 type FromFriendRequest struct {

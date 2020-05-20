@@ -6,24 +6,24 @@ import (
 	"log"
 	ch "projecta.com/me/chat"
 	cl "projecta.com/me/client"
-	"projecta.com/me/setenv"
-	vr "projecta.com/me/verification"
+	// "projecta.com/me/setenv"
+	// vr "projecta.com/me/verification"
 	ws "projecta.com/me/wsserver"
 )
 
 func main() {
 
 	// init address for WS Server
-	func() {
-		fmt.Println("Starting..!")
-		// upload ENV form config.yml
-		setenv.SetupConfigToENV()
-	}()
+	// func() {
+	// 	fmt.Println("Starting..!")
+	// 	// upload ENV form config.yml
+	// 	setenv.SetupConfigToENV()
+	// }()
 
 	// init services
 	func() {
 		// ================================= auth
-		go vr.Server()
+		// go vr.Server()
 
 		// ================================= client
 		go cl.Start()

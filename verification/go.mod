@@ -1,8 +1,9 @@
-module projecta.com/me/verification
+module mod
 
 go 1.14
 
+replace projecta.com/me/verification => ../verification/verification
+
 require (
-	github.com/gorilla/mux v1.7.4
-	go.mongodb.org/mongo-driver v1.3.3
+    projecta.com/me/verification v1.0.0
 )
