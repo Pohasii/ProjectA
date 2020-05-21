@@ -7,5 +7,6 @@ import (
 
 func main () {
 	fmt.Println("start Auth Service")
+	verification.SetEnv()
 	verification.Server()
 }
