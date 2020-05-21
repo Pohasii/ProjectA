@@ -11,7 +11,7 @@ CD ../verification/
 - go build "parameters"
 
 # websocket Server and other system
-- When you want to start project
+- When you want to start the project
 - enter hosts value in ../wsserver/ENV.go
 #### AND
 
