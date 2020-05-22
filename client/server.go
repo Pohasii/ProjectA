@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 )
 
 // ChanInClient - channel for message for client service
@@ -28,8 +29,8 @@ var Profiles Clients = make(Clients)
 
 func initDB () {
 	//"mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false"
-	DbConn.initConnDB( "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false", "projecta", "users")
-	// DbConn.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+	// DbConn.initConnDB( "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false", "projecta", "users")
+	DbConn.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 }
 
 func Start() {

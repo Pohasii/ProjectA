@@ -29,8 +29,8 @@ func Authorization(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login is incorrect"})
 	} else {
 
-		// connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
-		connDb.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
+		connDb.initConnDB("mongodb://"+os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+		// connDb.initConnDB(os.Getenv("DataBaseIP"), "projecta", "users")
 		defer connDb.close()
 
 		request := bson.D{

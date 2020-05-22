@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
+	"os"
 )
 
 func Registration(w http.ResponseWriter, r *http.Request) {
@@ -21,8 +22,8 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 	if Credential.Login == "" && Credential.Password == "" {
 		json.NewEncoder(w).Encode(Failed{"Sorry, your password or login incorrect"})
 	} else {
-		connDb.initConnDB("mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false", "projecta", "users")
-		// connDb.initConnDB("mongodb://"+ os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
+
+		connDb.initConnDB("mongodb://"+os.Getenv("DataBaseIP")+":"+os.Getenv("DataBasePORT"), "ProjectA", "users")
 		defer connDb.close()
 
 		count, err := connDb.Collection.CountDocuments(connDb.ctx, bson.D{{"login", Credential.Login}})

@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"os"
 )
 
 var OutChan chan []byte = make(chan []byte, 1000)
@@ -60,6 +61,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 // start http Websocket server
 func Start() {
 
+	SetEnv()
 	// go Conns.CleanOffConn()
 	go router()
 
@@ -69,9 +71,8 @@ func Start() {
 		ServeWs(w, r, &Conns)
 	})
 
-	// 	var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")
-	var addr = flag.String("addr", "localhost:55443", "http service address")
-	//fmt.Println("The websocket's server started at the ", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"))
+	var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")
+	fmt.Println("The websocket's server started at the ", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"))
 
 	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
 	err := http.ListenAndServe(*addr, nil) // *addr
@@ -81,7 +82,7 @@ func Start() {
 
 }
 
-func router () {
+func router() {
 	for let := range OutChan {
 		letter := Letter{}
 		err := json.Unmarshal(let, &letter)
