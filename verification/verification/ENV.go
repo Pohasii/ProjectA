@@ -3,8 +3,8 @@ package verification
 import "os"
 
 const (
-	AuthServerHost = "127.0.0.1"
-	AuthServerPort = "55443"
+	AuthServerHost = "0.0.0.0" //"127.0.0.1"
+	AuthServerPort = "80"
 	DbServerHost   = "127.0.0.1"
 	DbServerPort   = "27001"
 )
