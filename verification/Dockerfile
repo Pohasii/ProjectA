@@ -1,8 +1,9 @@
 FROM golang:1.14.3-alpine3.11
 RUN mkdir /app
-ADD . /app/
+COPY . /app/
 WORKDIR /app
-RUN apk update && apk add ca-certificates tzdata
+RUN apk update && \
+    apk add ca-certificates tzdata
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o server .
 
 #scratch  alpine:latest
