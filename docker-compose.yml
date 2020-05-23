@@ -1,0 +1,15 @@
+version: "3"
+services:
+  go-docker-image:
+    build: ./verification/
+    ports:
+      - '55442:80'
+    volumes:
+      - ./:/app
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/redis.conf:/redis.conf
+    command: [ "redis-server", "/redis.conf" ]
