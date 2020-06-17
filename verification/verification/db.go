@@ -2,7 +2,12 @@ package verification
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"go.mongodb.org/mongo-driver/bson"
+	"io"
 	"log"
+	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -68,4 +73,51 @@ func (db *mongodb) close() {
 	db.ctx = nil
 	db.db = nil
 	db.Collection = nil
+}
+
+func checkAkk(connDb mongodb, Credential Credentials) bool {
+
+	filter := bson.D{
+		{"password", Credential.Password},
+		{"login", Credential.Login},
+	}
+
+	count, err := connDb.Collection.CountDocuments(connDb.ctx, filter)
+	if err != nil {
+		log.Println("auth service, checkAkk error: ", err)
+	}
+
+	if count == 1 {
+		return true
+	}
+	return false
+}
+
+func updateAkk(connDb mongodb, Credential Credentials) (Client Profile, status bool) {
+
+	h := md5.New()
+	time := strconv.Itoa(int(time.Now().Unix()))
+	io.WriteString(h, time)
+	token := hex.EncodeToString(h.Sum([]byte(time)))
+
+	update := bson.D{
+		{"$set", bson.D{
+			{"token", token},
+		}},
+	}
+
+	filter := bson.D{
+		{"password", Credential.Password},
+		{"login", Credential.Login},
+	}
+
+	opts := options.FindOneAndUpdate().SetUpsert(true)
+
+	err := connDb.Collection.FindOneAndUpdate(connDb.ctx, filter, update, opts).Decode(&Client)
+	if err != nil {
+		log.Println("auth service, updateAkk error: ", err)
+		return Client, false
+	}
+
+	return Client, true
 }

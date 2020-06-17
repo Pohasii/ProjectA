@@ -10,6 +10,8 @@ import (
 )
 
 func Server() {
+
+	go redisInit()
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", mainPage).Methods("GET")

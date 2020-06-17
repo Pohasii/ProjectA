@@ -61,6 +61,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 // start http Websocket server
 func Start() {
 
+	redisInit()
 	SetEnv()
 	// go Conns.CleanOffConn()
 	go router()

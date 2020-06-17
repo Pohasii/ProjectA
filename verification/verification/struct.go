@@ -15,6 +15,7 @@ type Profile struct {
 type Credentials struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+	ConnType string `json:"conntype"`
 }
 
 type Failed struct {

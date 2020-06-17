@@ -1,4 +1,4 @@
-FROM golang:1.14.3-alpine3.11
+FROM golang:1.14.3-alpine3.11 as builder
 RUN mkdir /app
 COPY . /app/
 WORKDIR /app
@@ -8,8 +8,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server .
 
 #scratch  alpine:latest
 FROM scratch
-COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=0 /usr/share/zoneinfo /usr/share/zoneinfo/
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo/
 WORKDIR /root/
-COPY --from=0 /app/server .
+COPY --from=builder /app/server .
 CMD ["./server"]
