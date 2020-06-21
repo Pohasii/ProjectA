@@ -2,21 +2,26 @@ version: "3"
 services:
   auth-service_container:
     build: ./verification/
+    restart: always
     ports:
       - '55442:80'
     volumes:
       - ./:/app
+
   redis_container:
     image: redis:latest
     container_name: redis
+    restart: always
     ports:
       - 6379:6379
     volumes:
       - ./redis/redis.conf:/redis.conf
     command: [ "redis-server", "/redis.conf" ]
+
   mongodb_container:
     image: mongo:latest
     container_name: mongodb
+    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
@@ -24,3 +29,35 @@ services:
       - 27017:27017
     volumes:
       - ./mongodb/ProjectA/:/data/db/
+
+  postgres:
+    container_name: postgres_container
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - ./pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
