@@ -1,4 +1,4 @@
-package wsserver
+package wslib
 
 import (
 	"encoding/json"
@@ -8,15 +8,18 @@ import (
 	"log"
 	"net/http"
 	"os"
+	redis "projecta.com/me/redis"
 )
 
-var OutChan chan []byte = make(chan []byte, 1000)
+var Red redis.Redis = redis.Redis{}
+
+var OutChan = make(chan []byte, 1000)
 
 // var InChan chan Letter = make(chan Letter, 500)
-var FromConnChan chan []byte = make(chan []byte, 1000)
+var FromConnChan = make(chan []byte, 1000)
 
-func GetOutChan() chan []byte {
-	return OutChan
+func GetOutChan() *chan []byte {
+	return &OutChan
 }
 
 func GetFromConnChan() chan []byte {
@@ -24,7 +27,7 @@ func GetFromConnChan() chan []byte {
 }
 
 // Conns - all connection clients
-var Conns Connections = make(Connections, 0, MaxConnections)
+var Conns = make(Connections, 0, MaxConnections)
 
 var (
 	newline = []byte{'\n'}
@@ -61,9 +64,9 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 // start http Websocket server
 func Start() {
 
-	redisInit()
+	// redis init connections
+	Red.Init(0)
 	SetEnv()
-	// go Conns.CleanOffConn()
 	go router()
 
 	flag.Parse()

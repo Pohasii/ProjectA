@@ -6,7 +6,7 @@ import (
 	"log"
 	ch "projecta.com/me/chat"
 	cl "projecta.com/me/client"
-	ws "projecta.com/me/wsserver"
+	"projecta.com/me/wsserver/src"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 		go cl.Start()
 
 		// ================================= ws server
-		go ws.Start()
+		go src.Start()
 
 		// ================================= Chats
 		ch.Start()
@@ -30,8 +30,8 @@ func main() {
 	// init channels
 
 	// websocket
-	ChanFromWS := ws.GetFromConnChan()
-	ChanForWS := ws.GetOutChan()
+	ChanFromWS := src.GetFromConnChan()
+	ChanForWS := src.GetOutChan()
 
 	// chat
 	InChatChan := ch.GetInChatChan()

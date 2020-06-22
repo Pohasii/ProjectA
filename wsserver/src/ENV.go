@@ -1,4 +1,4 @@
-package wsserver
+package wslib
 
 import "os"
 
@@ -17,5 +17,5 @@ func SetEnv() {
 	os.Setenv("WebsocketPORT", WsServerPort)
 	os.Setenv("DataBaseIP", DbServerHost)
 	os.Setenv("DataBasePORT", DbServerPort)
-	os.Setenv("RedisConn", RedisHost +":"+ RedisPort)
+	os.Setenv("RedisConn", RedisHost+":"+RedisPort)
 }

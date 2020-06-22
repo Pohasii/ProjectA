@@ -1,4 +1,4 @@
-package wsserver
+package wslib
 
 import (
 	"fmt"
@@ -6,6 +6,20 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+// new
+
+// Client Hub
+type ClientHub struct {
+	Connections map[int]Client
+	ID int
+}
+
+func (ch *ClientHub) getID () int {
+	return ch.ID
+}
+
+// old ========================================================
 
 // Connections - []Client
 type Connections []Client

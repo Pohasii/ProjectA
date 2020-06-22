@@ -1,4 +1,4 @@
-package wsserver
+package wslib
 
 import (
 	"bytes"
@@ -30,7 +30,7 @@ func (c *Client) writePump() {
 		ticker.Stop()
 		c.Conn.Close()
 		c.Status = false
-		
+
 		mes, err := json.Marshal(Letter{c.ID, "1901", "Off"})
 		if err != nil {
 			log.Println(err)

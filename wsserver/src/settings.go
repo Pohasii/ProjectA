@@ -1,4 +1,4 @@
-package wsserver
+package wslib
 
 import (
 	"time"
