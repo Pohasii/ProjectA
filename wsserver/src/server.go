@@ -1,4 +1,4 @@
-package wslib
+package main
 
 import (
 	"encoding/json"
@@ -8,10 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	redis "projecta.com/me/redis"
 )
-
-var Red redis.Redis = redis.Redis{}
 
 var OutChan = make(chan []byte, 1000)
 
@@ -65,7 +62,6 @@ func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
 func Start() {
 
 	// redis init connections
-	Red.Init(0)
 	SetEnv()
 	go router()
 

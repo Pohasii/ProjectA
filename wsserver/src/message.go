@@ -1,4 +1,4 @@
-package wslib
+package main
 
 // Message - slice bytes
 //[]byte

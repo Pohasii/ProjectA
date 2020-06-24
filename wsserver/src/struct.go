@@ -1,4 +1,4 @@
-package wslib
+package main
 
 // UsersOnline and UserOnline used in PushOnlineClientsToChat fucn, file connections
 type UsersOnline []UserOnline

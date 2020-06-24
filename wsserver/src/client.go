@@ -1,4 +1,4 @@
-package wslib
+package main
 
 import (
 	"bytes"
