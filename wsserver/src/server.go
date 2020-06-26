@@ -15,14 +15,6 @@ var OutChan = make(chan []byte, 1000)
 // var InChan chan Letter = make(chan Letter, 500)
 var FromConnChan = make(chan []byte, 1000)
 
-func GetOutChan() *chan []byte {
-	return &OutChan
-}
-
-func GetFromConnChan() chan []byte {
-	return FromConnChan
-}
-
 // Conns - all connection clients
 var Conns = make(Connections, 0, MaxConnections)
 
@@ -74,7 +66,9 @@ func Start() {
 	var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")
 	fmt.Println("The websocket's server started at the ", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"))
 
-	// err := srv.ListenAndServeTLS(*addr,"server.crt", "server.key", nil)
+	// err := http.ListenAndServeTLS(*addr,"private.crt", "private.key", nil)
+	// http.ListenAndServeTLS()
+
 	err := http.ListenAndServe(*addr, nil) // *addr
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

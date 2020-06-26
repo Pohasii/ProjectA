@@ -72,7 +72,7 @@ func (id *ID) Get() int {
 	id.ID++
 
 	// unblock
-	id.RUnlock()
+	defer id.RUnlock()
 
 	// return result
 	return id.ID

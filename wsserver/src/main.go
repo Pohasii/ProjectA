@@ -10,7 +10,7 @@ var Red redis.Redis = redis.Redis{}
 func main() {
 
 	// init redis connection
-	Red.Init(0)
+	// Red.Init(0)
 	Start()
 }
 

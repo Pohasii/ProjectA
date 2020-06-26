@@ -3,7 +3,7 @@ package main
 import "os"
 
 const (
-	WsServerHost = "127.0.0.1"
+	WsServerHost = "192.168.0.65"
 	WsServerPort = "55443"
 	DbServerHost = "127.0.0.1"
 	DbServerPort = "27001"
