@@ -10,9 +10,9 @@ import (
 
 // new
 
-// Client Hub
+// ClientHub Client Hub
 type ClientHub struct {
-	Connections map[int]Client
+	Connections map[int]*Client
 	ID          ID
 }
 
@@ -23,13 +23,18 @@ func (ch *ClientHub) getID() int {
 	return ch.ID.Get()
 }
 
-func (ch *ClientHub) AddClient(client Client) bool {
+// AddClient
+func (ch *ClientHub) AddClient(client *Client) bool {
 	ID := ch.getID()
 
 	// _, ok := m["route"]
 	_, ok := ch.Connections[ID]
-	if ok {
+	if !ok {
 		ch.Connections[ID] = client
+		ch.Connections[ID].start()
+		ch.Connections[ID].ID = ID
+		ch.Connections[ID].Status = true
+
 		return true
 	}
 
@@ -48,7 +53,7 @@ func (ch *ClientHub) DelClientByID(ID int) bool {
 }
 
 // GetClientByID(ID int) (bool, Client)
-func (ch *ClientHub) GetClientByID(ID int) (bool, Client) {
+func (ch *ClientHub) GetClientByID(ID int) (bool, *Client) {
 
 	client, ok := ch.Connections[ID]
 	return ok, client

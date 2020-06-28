@@ -32,19 +32,27 @@ var upgrader = websocket.Upgrader{
 }
 
 // ServeWs handles websocket requests from the peer.
-func ServeWs(w http.ResponseWriter, r *http.Request, Conns *Connections) {
+func ServeWs(w http.ResponseWriter, r *http.Request) {
 	for {
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println("Where: ", err)
+			log.Println("ServeWs, upgrader.Upgrade: ", err)
 			return
 		}
 
 		fmt.Println("new client: ", conn.RemoteAddr())
 		// add conn to
-		(*Conns).Add(conn)
-		(*Conns)[len(*Conns)-1].start()
+
+		res := Hub.AddClient(InitClient(conn))
+		if res {
+			fmt.Println("successful")
+		} else {
+			fmt.Println("failed to add client")
+		}
+
+		//(*Conns).Add(conn)
+		//(*Conns)[len(*Conns)-1].start()
 
 	}
 }
@@ -60,7 +68,7 @@ func Start() {
 	flag.Parse()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-		ServeWs(w, r, &Conns)
+		ServeWs(w, r)
 	})
 
 	var addr = flag.String("addr", os.Getenv("WebsocketIP")+":"+os.Getenv("WebsocketPORT"), "http service address")

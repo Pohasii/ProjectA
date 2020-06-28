@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"log"
-	"os"
 	"time"
 )
 
@@ -16,11 +15,11 @@ type Redis struct {
 }
 
 // init connection with Redis server
-func (r *Redis) Init(numbDB int) {
+func (r *Redis) Init(redisAddr, redisPass string, numbDB int) {
 	count := 0
 	r.conn = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("RedisAddr"),
-		Password: os.Getenv("RedisPass"),
+		Addr:     redisAddr,
+		Password: redisPass,
 		DB:       numbDB,
 	})
 
@@ -33,7 +32,7 @@ func (r *Redis) Init(numbDB int) {
 			}
 			count++
 			time.Sleep(1000)
-			r.Init(numbDB)
+			r.Init(redisAddr, redisPass, numbDB)
 		}()
 	}
 	fmt.Println(pong, err)

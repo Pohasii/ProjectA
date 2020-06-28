@@ -128,7 +128,6 @@ func (c *Client) readPump() {
 
 // start - func for start methods of client
 func (c *Client) start() {
-
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go c.writePump()
@@ -137,6 +136,18 @@ func (c *Client) start() {
 
 // GetID - return Client ID
 // type int
-func (c *Client) GetID() int {
+func (c Client) GetID() int {
 	return c.ID
+}
+
+// InitClient - (c *websocket.Conn) *Client
+func InitClient (c *websocket.Conn) *Client {
+	client := &Client{
+		Conn: c,
+
+		// Buffered channel of outbound messages.
+		Send:   make(chan []byte, maxMessageSize),
+	}
+
+	return client
 }
